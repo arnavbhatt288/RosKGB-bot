@@ -1,4 +1,5 @@
 
+import datetime
 import discord
 from discord.ext import commands
 from discord.utils import get
@@ -19,7 +20,13 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    print(f"{message.channel}: {message.author}: {message.content}")
+    now = datetime.datetime.now()
+    today = now.strftime("%Y-%m-%d %H:%M")
+    file = open("chat.txt", "a")
+
+    file.write(str(today) + f" {message.channel}: {message.author}: {message.content}\n")
+    file.close()
+    
     await client.process_commands(message)
 
 @client.command(pass_context = True)
@@ -142,4 +149,4 @@ async def winerror(nes, value: str):
         await nes.send(f"Error code not found! Please check the code and try again.")
 
 
-client.run('')
+client.run('no token')
