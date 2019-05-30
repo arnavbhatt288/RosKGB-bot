@@ -31,6 +31,13 @@ async def on_message(message):
 
 @client.command(pass_context = True)
 async def bugcheck(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = '0' * strValue + value
+
     from bugcheck import bugdict
 
     if value in bugdict:
@@ -42,14 +49,23 @@ async def bugcheck(nes, value: str):
 @client.command(pass_context = True)
 @commands.has_any_role('Admins', 'Moderators')
 async def blacklist(nes, value: str):
-    blacklist = open("blacklist.dat", "rb")
-    data = pickle.load(blacklist)
-    blacklist.close()
-    blacklist = open("blacklist.dat", "wb")
-    data.append(value)
-    pickle.dump(data, blacklist)
-    blacklist.close()
-    await nes.send(f"User blacklisted.")
+    if len(value) == 18:
+        with open("blacklist.dat", "rb") as blacklist:
+            data = pickle.load(blacklist)
+            blacklist.close()
+
+        if value in data:
+            await nes.send(f"User already exists!")
+
+        else:
+            with open("blacklist.dat", "wb") as blacklist:
+                data.append(value)
+                pickle.dump(data, blacklist)
+                blacklist.close()
+            await nes.send(f"User blacklisted.")
+
+    else:
+        await nes.send(f"Invalid User ID! Please try again.")
 
 @client.command(pass_context = True)
 async def help(nes):
@@ -57,15 +73,16 @@ async def help(nes):
         colour = discord.Colour.blue()
     )
 
-    embed.set_author(name = 'BSOD Bot V1.5 - Commands')
+    embed.set_author(name = 'RosKGB V2.0 - Commands')
     embed.add_field(name = '$bugcheck <VALUE>', value = "Gives meaning of bugcheck codes.", inline = False)
-    embed.add_field(name = '$blacklist <VALUE>', value = "(ONLY FOR ADMIN AND MODERATORS) Blacklists an user for usage of $pol command.", inline = False)
-    embed.add_field(name = '$unblacklist <VALUE>', value = "(ONLY FOR ADMIN AND MODERATORS) Unblacklists an user for usage of $pol command.", inline = False)
+    embed.add_field(name = '$blacklist <VALUE>', value = "(ONLY FOR ADMIN AND MODERATORS) Blacklists an user for usage of $pol and $unpol command.", inline = False)
+    embed.add_field(name = '$unblacklist <VALUE>', value = "(ONLY FOR ADMIN AND MODERATORS) Unblacklists an user for usage of $pol and $unpol command.", inline = False)
     embed.add_field(name = '$hi', value = "Says hello world to you.", inline = False)
     embed.add_field(name = '$hresult <VALUE>', value = "Gives meaning of hresult codes.", inline = False)
     embed.add_field(name = '$mmresult <VALUE>', value = "Gives meaning of mmresult codes.", inline = False)
     embed.add_field(name = '$ntstatus <VALUE>', value = "Gives meaning of ntstatus codes.", inline = False)
     embed.add_field(name = '$pol', value = "Gives Politics role to you.", inline = False)
+    embed.add_field(name = '$unpol', value = "Removes Politics role from you.", inline = False)
     embed.add_field(name = '$winerror <VALUE>', value = "Gives meaning of winerror codes.", inline = False)
     await nes.send(embed = embed)
 
@@ -76,6 +93,13 @@ async def hi(nes):
 
 @client.command(pass_context = True)
 async def hresult(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = '0' * strValue + value
+
     from hresult import hrdict
 
     if value in hrdict:
@@ -86,6 +110,12 @@ async def hresult(nes, value: str):
 
 @client.command(pass_context = True)
 async def mmresult(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if value.count("0") > 0:
+        value = value.lstrip('0')
+
     from mmresult import mmdict
 
     if value in mmdict:
@@ -96,6 +126,13 @@ async def mmresult(nes, value: str):
 
 @client.command(pass_context = True)
 async def ntstatus(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = '0' * strValue + value
+
     from ntstatus import ntdict
 
     if value in ntdict:
@@ -106,15 +143,18 @@ async def ntstatus(nes, value: str):
 
 @client.command(pass_context = True)
 async def pol(nes):
-    blacklist = open("blacklist.dat", "rb")
-    data = pickle.load(blacklist)
-    blacklist.close()
+    with open("blacklist.dat", "rb") as blacklist:
+        data = pickle.load(blacklist)
+        blacklist.close()
     author = nes.message.author
     id = str(nes.message.author.id)
     role = get(author.guild.roles, name = "Politics")
 
     if id in data:
         return
+
+    elif role in author.roles:
+        await nes.send(f"You already have the role!")
 
     else:
         await author.add_roles(role)
@@ -123,23 +163,51 @@ async def pol(nes):
 @client.command(pass_context = True)
 @commands.has_any_role('Admins', 'Moderators')
 async def unblacklist(nes, value: str):
-    blacklist = open("blacklist.dat", "rb")
-    data = pickle.load(blacklist)
-    blacklist.close()
-    id = str(value)
-    
-    if id in data:
-        blacklist = open("blacklist.dat", "wb")
-        data.remove(id)
-        pickle.dump(data, blacklist)
-        blacklist.close()
-        await nes.send(f"User unblacklisted.")
+    if len(value) == 18:
+        with open("blacklist.dat", "rb") as blacklist:
+            data = pickle.load(blacklist)
+            blacklist.close()
+
+        if value in data:
+            with open("blacklist.dat", "wb") as blacklist:
+                data.remove(value)
+                pickle.dump(data, blacklist)
+                blacklist.close()
+            await nes.send(f"User unblacklisted.")
+
+        else:
+            await nes.send(f"User doesn't exist! Please try again.")
 
     else:
-        await nes.send(f"User doesn't exist! Please try again.")
+        await nes.send(f"Invalid User ID! Please try again.")
+
+@client.command(pass_context = True)
+async def unpol(nes):
+    with open("blacklist.dat", "rb") as blacklist:
+        data = pickle.load(blacklist)
+        blacklist.close()
+    author = nes.message.author
+    id = str(nes.message.author.id)
+    role = get(author.guild.roles, name = "Politics")
+
+    if id in data:
+        return
+
+    elif not role in author.roles:
+        await nes.send(f"You don't already have the role!")
+
+    else:
+        await author.remove_roles(role)
+        await nes.send(f"Role removed from you.")
 
 @client.command(pass_context = True)
 async def winerror(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if value.count("0") > 0:
+        value = value.lstrip('0')
+
     from winerror import windict
 
     if value in windict:
@@ -149,4 +217,4 @@ async def winerror(nes, value: str):
         await nes.send(f"Error code not found! Please check the code and try again.")
 
 
-client.run('no token')
+client.run('No token')

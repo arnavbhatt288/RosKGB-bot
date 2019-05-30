@@ -1,69 +1,69 @@
-<?xml version="1.0" ?>
+﻿<?xml version="1.0" ?>
 <HresultList>
-	<Hresult text="S_OK" value="0" />
-	<Hresult text="S_FALSE" value="1" />
-	<Hresult text="STG_S_CONVERTED" value="30200" />
-	<Hresult text="STG_S_BLOCK" value="30201" />
-	<Hresult text="STG_S_RETRYNOW" value="30202" />
-	<Hresult text="STG_S_MONITORING" value="30203" />
-	<Hresult text="STG_S_MULTIPLEOPENS" value="30204" />
-	<Hresult text="STG_S_CONSOLIDATIONFAILED" value="30205" />
-	<Hresult text="STG_S_CANNOTCONSOLIDATE" value="30206" />
-	<Hresult text="OLE_S_USEREG" value="40000" />
-	<Hresult text="OLE_S_STATIC" value="40001" />
-	<Hresult text="OLE_S_MAC_CLIPFORMAT" value="40002" />
-	<Hresult text="DRAGDROP_S_DROP" value="40100" />
-	<Hresult text="DRAGDROP_S_CANCEL" value="40101" />
-	<Hresult text="DRAGDROP_S_USEDEFAULTCURSORS" value="40102" />
-	<Hresult text="DATA_S_SAMEFORMATETC" value="40130" />
-	<Hresult text="VIEW_S_ALREADY_FROZEN" value="40140" />
-	<Hresult text="CACHE_S_FORMATETC_NOTSUPPORTED" value="40170" />
-	<Hresult text="CACHE_S_SAMECACHE" value="40171" />
-	<Hresult text="CACHE_S_SOMECACHES_NOTUPDATED" value="40172" />
-	<Hresult text="OLEOBJ_S_INVALIDVERB" value="40180" />
-	<Hresult text="OLEOBJ_S_CANNOT_DOVERB_NOW" value="40181" />
-	<Hresult text="OLEOBJ_S_INVALIDHWND" value="40182" />
-	<Hresult text="INPLACE_S_TRUNCATED" value="401A0" />
-	<Hresult text="CONVERT10_S_NO_PRESENTATION" value="401C0" />
-	<Hresult text="MK_S_REDUCED_TO_SELF" value="401E2" />
-	<Hresult text="MK_S_ME" value="401E4" />
-	<Hresult text="MK_S_HIM" value="401E5" />
-	<Hresult text="MK_S_US" value="401E6" />
-	<Hresult text="MK_S_MONIKERALREADYREGISTERED" value="401E7" />
-	<Hresult text="EVENT_S_SOME_SUBSCRIBERS_FAILED" value="40200" />
-	<Hresult text="EVENT_S_NOSUBSCRIBERS" value="40202" />
-	<Hresult text="SCHED_S_TASK_READY" value="41300" />
-	<Hresult text="SCHED_S_TASK_RUNNING" value="41301" />
-	<Hresult text="SCHED_S_TASK_DISABLED" value="41302" />
-	<Hresult text="SCHED_S_TASK_HAS_NOT_RUN" value="41303" />
-	<Hresult text="SCHED_S_TASK_NO_MORE_RUNS" value="41304" />
-	<Hresult text="SCHED_S_TASK_NOT_SCHEDULED" value="41305" />
-	<Hresult text="SCHED_S_TASK_TERMINATED" value="41306" />
-	<Hresult text="SCHED_S_TASK_NO_VALID_TRIGGERS" value="41307" />
-	<Hresult text="SCHED_S_EVENT_TRIGGER" value="41308" />
-	<Hresult text="XACT_S_ASYNC" value="4D000" />
-	<Hresult text="XACT_S_DEFECT" value="4D001" />
-	<Hresult text="XACT_S_READONLY" value="4D002" />
-	<Hresult text="XACT_S_SOMENORETAIN" value="4D003" />
-	<Hresult text="XACT_S_OKINFORM" value="4D004" />
-	<Hresult text="XACT_S_MADECHANGESCONTENT" value="4D005" />
-	<Hresult text="XACT_S_MADECHANGESINFORM" value="4D006" />
-	<Hresult text="XACT_S_ALLNORETAIN" value="4D007" />
-	<Hresult text="XACT_S_ABORTING" value="4D008" />
-	<Hresult text="XACT_S_SINGLEPHASE" value="4D009" />
-	<Hresult text="XACT_S_LOCALLY_OK" value="4D00A" />
-	<Hresult text="XACT_S_LASTRESOURCEMANAGER" value="4D010" />
-	<Hresult text="CO_S_NOTALLINTERFACES" value="80012" />
-	<Hresult text="CO_S_MACHINENAMENOTFOUND" value="80013" />
-	<Hresult text="SEC_I_CONTINUE_NEEDED" value="90312" />
-	<Hresult text="SEC_I_COMPLETE_NEEDED" value="90313" />
-	<Hresult text="SEC_I_COMPLETE_AND_CONTINUE" value="90314" />
-	<Hresult text="SEC_I_LOCAL_LOGON" value="90315" />
-	<Hresult text="SEC_I_CONTEXT_EXPIRED" value="90317" />
-	<Hresult text="SEC_I_INCOMPLETE_CREDENTIALS" value="90320" />
-	<Hresult text="SEC_I_RENEGOTIATE" value="90321" />
-	<Hresult text="SEC_I_NO_LSA_CONTEXT" value="90323" />
-	<Hresult text="CRYPT_I_NEW_PROTECTION_REQUIRED" value="91012" />
+	<Hresult text="S_OK" value="00000000" />
+	<Hresult text="S_FALSE" value="00000001" />
+	<Hresult text="STG_S_CONVERTED" value="00030200" />
+	<Hresult text="STG_S_BLOCK" value="00030201" />
+	<Hresult text="STG_S_RETRYNOW" value="00030202" />
+	<Hresult text="STG_S_MONITORING" value="00030203" />
+	<Hresult text="STG_S_MULTIPLEOPENS" value="00030204" />
+	<Hresult text="STG_S_CONSOLIDATIONFAILED" value="00030205" />
+	<Hresult text="STG_S_CANNOTCONSOLIDATE" value="00030206" />
+	<Hresult text="OLE_S_USEREG" value="00040000" />
+	<Hresult text="OLE_S_STATIC" value="00040001" />
+	<Hresult text="OLE_S_MAC_CLIPFORMAT" value="00040002" />
+	<Hresult text="DRAGDROP_S_DROP" value="00040100" />
+	<Hresult text="DRAGDROP_S_CANCEL" value="00040101" />
+	<Hresult text="DRAGDROP_S_USEDEFAULTCURSORS" value="00040102" />
+	<Hresult text="DATA_S_SAMEFORMATETC" value="00040130" />
+	<Hresult text="VIEW_S_ALREADY_FROZEN" value="00040140" />
+	<Hresult text="CACHE_S_FORMATETC_NOTSUPPORTED" value="00040170" />
+	<Hresult text="CACHE_S_SAMECACHE" value="00040171" />
+	<Hresult text="CACHE_S_SOMECACHES_NOTUPDATED" value="00040172" />
+	<Hresult text="OLEOBJ_S_INVALIDVERB" value="00040180" />
+	<Hresult text="OLEOBJ_S_CANNOT_DOVERB_NOW" value="00040181" />
+	<Hresult text="OLEOBJ_S_INVALIDHWND" value="00040182" />
+	<Hresult text="INPLACE_S_TRUNCATED" value="000401A0" />
+	<Hresult text="CONVERT10_S_NO_PRESENTATION" value="000401C0" />
+	<Hresult text="MK_S_REDUCED_TO_SELF" value="000401E2" />
+	<Hresult text="MK_S_ME" value="000401E4" />
+	<Hresult text="MK_S_HIM" value="000401E5" />
+	<Hresult text="MK_S_US" value="000401E6" />
+	<Hresult text="MK_S_MONIKERALREADYREGISTERED" value="000401E7" />
+	<Hresult text="EVENT_S_SOME_SUBSCRIBERS_FAILED" value="00040200" />
+	<Hresult text="EVENT_S_NOSUBSCRIBERS" value="00040202" />
+	<Hresult text="SCHED_S_TASK_READY" value="00041300" />
+	<Hresult text="SCHED_S_TASK_RUNNING" value="00041301" />
+	<Hresult text="SCHED_S_TASK_DISABLED" value="00041302" />
+	<Hresult text="SCHED_S_TASK_HAS_NOT_RUN" value="00041303" />
+	<Hresult text="SCHED_S_TASK_NO_MORE_RUNS" value="00041304" />
+	<Hresult text="SCHED_S_TASK_NOT_SCHEDULED" value="00041305" />
+	<Hresult text="SCHED_S_TASK_TERMINATED" value="00041306" />
+	<Hresult text="SCHED_S_TASK_NO_VALID_TRIGGERS" value="00041307" />
+	<Hresult text="SCHED_S_EVENT_TRIGGER" value="00041308" />
+	<Hresult text="XACT_S_ASYNC" value="0004D000" />
+	<Hresult text="XACT_S_DEFECT" value="0004D001" />
+	<Hresult text="XACT_S_READONLY" value="0004D002" />
+	<Hresult text="XACT_S_SOMENORETAIN" value="0004D003" />
+	<Hresult text="XACT_S_OKINFORM" value="0004D004" />
+	<Hresult text="XACT_S_MADECHANGESCONTENT" value="0004D005" />
+	<Hresult text="XACT_S_MADECHANGESINFORM" value="0004D006" />
+	<Hresult text="XACT_S_ALLNORETAIN" value="0004D007" />
+	<Hresult text="XACT_S_ABORTING" value="0004D008" />
+	<Hresult text="XACT_S_SINGLEPHASE" value="0004D009" />
+	<Hresult text="XACT_S_LOCALLY_OK" value="0004D00A" />
+	<Hresult text="XACT_S_LASTRESOURCEMANAGER" value="0004D010" />
+	<Hresult text="CO_S_NOTALLINTERFACES" value="00080012" />
+	<Hresult text="CO_S_MACHINENAMENOTFOUND" value="00080013" />
+	<Hresult text="SEC_I_CONTINUE_NEEDED" value="00090312" />
+	<Hresult text="SEC_I_COMPLETE_NEEDED" value="00090313" />
+	<Hresult text="SEC_I_COMPLETE_AND_CONTINUE" value="00090314" />
+	<Hresult text="SEC_I_LOCAL_LOGON" value="00090315" />
+	<Hresult text="SEC_I_CONTEXT_EXPIRED" value="00090317" />
+	<Hresult text="SEC_I_INCOMPLETE_CREDENTIALS" value="00090320" />
+	<Hresult text="SEC_I_RENEGOTIATE" value="00090321" />
+	<Hresult text="SEC_I_NO_LSA_CONTEXT" value="00090323" />
+	<Hresult text="CRYPT_I_NEW_PROTECTION_REQUIRED" value="00091012" />
 	<Hresult text="E_NOTIMPL" value="80000001" />
 	<Hresult text="E_OUTOFMEMORY" value="80000002" />
 	<Hresult text="E_INVALIDARG" value="80000003" />
@@ -1085,6 +1085,7 @@
 	<Hresult text="COMADMIN_E_PARTITIONS_DISABLED" value="80110824" />
 	<Hresult text="ERROR_AUDITING_DISABLED" value="C0090001" />
 	<Hresult text="ERROR_ALL_SIDS_FILTERED" value="C0090002" />
+	
 	<Hresult text="ERROR_FLT_IO_COMPLETE" value="001F0001" />
 	<Hresult text="ERROR_FLT_NO_HANDLER_DEFINED" value="801F0001" />
 	<Hresult text="ERROR_FLT_CONTEXT_ALREADY_DEFINED" value="801F0002" />
@@ -1112,4 +1113,5 @@
 	<Hresult text="ERROR_FLT_NO_DEVICE_OBJECT" value="801F0019" />
 	<Hresult text="ERROR_FLT_VOLUME_ALREADY_MOUNTED" value="801F001A" />
 	<Hresult text="ERROR_FLT_NO_WAITER_FOR_REPLY" value="801F0020" />
+
 </HresultList>
