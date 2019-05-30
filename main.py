@@ -1,14 +1,21 @@
+# id 574562317384024065
+# token NTc0NTYyMzE3Mzg0MDI0MDY1.XOFrlw.2VCyJ7NPZb3HLFKzUC_m1vbmRbc
+# https://discordapp.com/api/oauth2/authorize?client_id=574562317384024065&permissions=268503040&scope=bot
 
-from bugcheck import bugdict
 import datetime
 import discord
+import logging
+import pickle
+import sys
+import time
+import os
+import re
+from bugcheck import bugdict
 from discord.ext import commands
 from discord.utils import get
-from hresult import hrdict
-import logging
 from mmresult import mmdict
 from ntstatus import ntdict
-import pickle
+from hresult import hrdict
 from winerror import windict
 client = commands.Bot(command_prefix = '$')
 client.remove_command('help')
@@ -18,6 +25,9 @@ logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
+
+with open("blacklist.dat", "rb") as blacklist:
+    data = pickle.load(blacklist)
 
 # Start of the bot
 
@@ -117,26 +127,98 @@ async def winerror(nes, value: str):
     else:
         await nes.send(f"Error code not found! Please check the code and try again.")
 
-# Other commands
+# Server commands
 
 @client.command(pass_context = True)
 @commands.has_any_role('Admins', 'Moderators')
 async def blacklist(nes, value: str):
-    if len(value) == 18:
-        with open("blacklist.dat", "rb") as blacklist:
-            data = pickle.load(blacklist)
-
+    if len(value) == 18 and value.isdigit():
         if value in data:
             await nes.send(f"User already exists!")
 
         else:
-            with open("blacklist.dat", "wb") as blacklist:
-                data.append(value)
-                pickle.dump(data, blacklist)
+            data.append(value)
             await nes.send(f"User blacklisted.")
 
     else:
         await nes.send(f"Invalid User ID! Please try again.")
+
+@client.command(pass_context = True)
+async def pol(nes):
+    author = nes.message.author
+    id = str(nes.message.author.id)
+    role = get(author.guild.roles, name = "Politics")
+
+    if id in data:
+        return
+
+    elif role in author.roles:
+        await nes.send(f"You already have the role!")
+
+    else:
+        await author.add_roles(role)
+        await nes.send(f"Role assigned to you.")
+
+@client.command(pass_context = True)
+@commands.has_any_role('Admins', 'Moderators')
+async def unblacklist(nes, value: str):
+    if len(value) == 18 and value.isdigit():
+        if value in data:
+            data.remove(value)
+            await nes.send(f"User unblacklisted.")
+
+        else:
+            await nes.send(f"User doesn't exist! Please try again.")
+
+    else:
+        await nes.send(f"Invalid User ID! Please try again.")
+
+@client.command(pass_context = True)
+async def unpol(nes):
+    author = nes.message.author
+    id = str(nes.message.author.id)
+    role = get(author.guild.roles, name = "Politics")
+
+    if id in data:
+        return
+
+    elif not role in author.roles:
+        await nes.send(f"You already don't have the role!")
+
+    else:
+        await author.remove_roles(role)
+        await nes.send(f"Role removed from you.")
+
+# Bot commands only accessible by bot creator and owner of server
+
+@client.command(pass_context = True)
+async def shutdown(nes):
+    if str(nes.message.author.id) == "confidential" or str(nes.message.author.id) == "confidential":
+        with open("blacklist.dat", "wb") as blacklist:
+            pickle.dump(data, blacklist)
+
+        await nes.send(f"Shutting down.")
+        time.sleep(3)
+        sys.exit(0)
+
+    else:
+        return
+
+@client.command(pass_context = True)
+async def reboot(nes):
+    if str(nes.message.author.id) == "confidential" or str(nes.message.author.id) == "confidential":
+        with open("blacklist.dat", "wb") as blacklist:
+            pickle.dump(data, blacklist)
+
+        await nes.send(f"Rebooting.")
+        time.sleep(3)
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
+
+    else:
+        return
+
+# Other commands
 
 @client.command(pass_context = True)
 async def help(nes):
@@ -162,60 +244,5 @@ async def hi(nes):
     author = nes.message.author.mention
     await nes.send("{} Hello World!" .format(author))
 
-@client.command(pass_context = True)
-async def pol(nes):
-    with open("blacklist.dat", "rb") as blacklist:
-        data = pickle.load(blacklist)
-    author = nes.message.author
-    id = str(nes.message.author.id)
-    role = get(author.guild.roles, name = "Politics")
 
-    if id in data:
-        return
-
-    elif role in author.roles:
-        await nes.send(f"You already have the role!")
-
-    else:
-        await author.add_roles(role)
-        await nes.send(f"Role assigned to you.")
-
-@client.command(pass_context = True)
-@commands.has_any_role('Admins', 'Moderators')
-async def unblacklist(nes, value: str):
-    if len(value) == 18:
-        with open("blacklist.dat", "rb") as blacklist:
-            data = pickle.load(blacklist)
-
-        if value in data:
-            with open("blacklist.dat", "wb") as blacklist:
-                data.remove(value)
-                pickle.dump(data, blacklist)
-            await nes.send(f"User unblacklisted.")
-
-        else:
-            await nes.send(f"User doesn't exist! Please try again.")
-
-    else:
-        await nes.send(f"Invalid User ID! Please try again.")
-
-@client.command(pass_context = True)
-async def unpol(nes):
-    with open("blacklist.dat", "rb") as blacklist:
-        data = pickle.load(blacklist)
-    author = nes.message.author
-    id = str(nes.message.author.id)
-    role = get(author.guild.roles, name = "Politics")
-
-    if id in data:
-        return
-
-    elif not role in author.roles:
-        await nes.send(f"You don't already have the role!")
-
-    else:
-        await author.remove_roles(role)
-        await nes.send(f"Role removed from you.")
-
-
-client.run('no token')
+client.run('No token.')
