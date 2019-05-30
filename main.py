@@ -1,10 +1,15 @@
 
+from bugcheck import bugdict
 import datetime
 import discord
 from discord.ext import commands
 from discord.utils import get
+from hresult import hrdict
 import logging
+from mmresult import mmdict
+from ntstatus import ntdict
 import pickle
+from winerror import windict
 client = commands.Bot(command_prefix = '$')
 client.remove_command('help')
 
@@ -13,6 +18,8 @@ logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
+
+# Start of the bot
 
 @client.event
 async def on_ready():
@@ -29,6 +36,8 @@ async def on_message(message):
     
     await client.process_commands(message)
 
+# Error code commands
+
 @client.command(pass_context = True)
 async def bugcheck(nes, value: str):
     if any(c in value for c in 'x'):
@@ -38,8 +47,6 @@ async def bugcheck(nes, value: str):
         strValue = 8 - len(value)
         value = '0' * strValue + value
 
-    from bugcheck import bugdict
-
     if value in bugdict:
         await nes.send("The meaning of this error code is - `{}`" .format(bugdict[value]))
 
@@ -47,12 +54,77 @@ async def bugcheck(nes, value: str):
         await nes.send(f"Error code not found! Please check the code and try again.")
 
 @client.command(pass_context = True)
+async def hresult(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = '0' * strValue + value
+
+    if value in hrdict:
+        await nes.send("The meaning of this error code is - `{}`" .format(hrdict[value]))
+
+    else:
+        await nes.send(f"Error code not found! Please check the code and try again.")
+
+@client.command(pass_context = True)
+async def mmresult(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if value.count("0") > 1:
+        while len(value) != 0:
+            value = value.lstrip('0')
+            if len(value) == 2 or len(value) == 1:
+                break
+
+    if value in mmdict:
+        await nes.send("The meaning of this error code is - `{}`" .format(mmdict[value]))
+
+    else:
+        await nes.send(f"Error code not found! Please check the code and try again.")
+
+@client.command(pass_context = True)
+async def ntstatus(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = '0' * strValue + value
+
+    if value in ntdict:
+        await nes.send("The meaning of this error code is - `{}`" .format(ntdict[value]))
+
+    else:
+        await nes.send(f"Error code not found! Please check the code and try again.")
+
+@client.command(pass_context = True)
+async def winerror(nes, value: str):
+    if any(c in value for c in 'x'):
+        value = value[2:]
+
+    if value.count("0") > 1:
+        while len(value) != 0:
+            value = value.lstrip('0')
+            if len(value) == 2 or len(value) == 1:
+                break
+
+    if value in windict:
+        await nes.send("The meaning of this error code is - `{}`" .format(windict[value]))
+
+    else:
+        await nes.send(f"Error code not found! Please check the code and try again.")
+
+# Other commands
+
+@client.command(pass_context = True)
 @commands.has_any_role('Admins', 'Moderators')
 async def blacklist(nes, value: str):
     if len(value) == 18:
         with open("blacklist.dat", "rb") as blacklist:
             data = pickle.load(blacklist)
-            blacklist.close()
 
         if value in data:
             await nes.send(f"User already exists!")
@@ -61,7 +133,6 @@ async def blacklist(nes, value: str):
             with open("blacklist.dat", "wb") as blacklist:
                 data.append(value)
                 pickle.dump(data, blacklist)
-                blacklist.close()
             await nes.send(f"User blacklisted.")
 
     else:
@@ -92,60 +163,9 @@ async def hi(nes):
     await nes.send("{} Hello World!" .format(author))
 
 @client.command(pass_context = True)
-async def hresult(nes, value: str):
-    if any(c in value for c in 'x'):
-        value = value[2:]
-
-    if len(value) < 8:
-        strValue = 8 - len(value)
-        value = '0' * strValue + value
-
-    from hresult import hrdict
-
-    if value in hrdict:
-        await nes.send("The meaning of this error code is - `{}`" .format(hrdict[value]))
-
-    else:
-        await nes.send(f"Error code not found! Please check the code and try again.")
-
-@client.command(pass_context = True)
-async def mmresult(nes, value: str):
-    if any(c in value for c in 'x'):
-        value = value[2:]
-
-    if value.count("0") > 0:
-        value = value.lstrip('0')
-
-    from mmresult import mmdict
-
-    if value in mmdict:
-        await nes.send("The meaning of this error code is - `{}`" .format(mmdict[value]))
-
-    else:
-        await nes.send(f"Error code not found! Please check the code and try again.")
-
-@client.command(pass_context = True)
-async def ntstatus(nes, value: str):
-    if any(c in value for c in 'x'):
-        value = value[2:]
-
-    if len(value) < 8:
-        strValue = 8 - len(value)
-        value = '0' * strValue + value
-
-    from ntstatus import ntdict
-
-    if value in ntdict:
-        await nes.send("The meaning of this error code is - `{}`" .format(ntdict[value]))
-
-    else:
-        await nes.send(f"Error code not found! Please check the code and try again.")
-
-@client.command(pass_context = True)
 async def pol(nes):
     with open("blacklist.dat", "rb") as blacklist:
         data = pickle.load(blacklist)
-        blacklist.close()
     author = nes.message.author
     id = str(nes.message.author.id)
     role = get(author.guild.roles, name = "Politics")
@@ -166,13 +186,11 @@ async def unblacklist(nes, value: str):
     if len(value) == 18:
         with open("blacklist.dat", "rb") as blacklist:
             data = pickle.load(blacklist)
-            blacklist.close()
 
         if value in data:
             with open("blacklist.dat", "wb") as blacklist:
                 data.remove(value)
                 pickle.dump(data, blacklist)
-                blacklist.close()
             await nes.send(f"User unblacklisted.")
 
         else:
@@ -185,7 +203,6 @@ async def unblacklist(nes, value: str):
 async def unpol(nes):
     with open("blacklist.dat", "rb") as blacklist:
         data = pickle.load(blacklist)
-        blacklist.close()
     author = nes.message.author
     id = str(nes.message.author.id)
     role = get(author.guild.roles, name = "Politics")
@@ -200,21 +217,5 @@ async def unpol(nes):
         await author.remove_roles(role)
         await nes.send(f"Role removed from you.")
 
-@client.command(pass_context = True)
-async def winerror(nes, value: str):
-    if any(c in value for c in 'x'):
-        value = value[2:]
 
-    if value.count("0") > 0:
-        value = value.lstrip('0')
-
-    from winerror import windict
-
-    if value in windict:
-        await nes.send("The meaning of this error code is - `{}`" .format(windict[value]))
-
-    else:
-        await nes.send(f"Error code not found! Please check the code and try again.")
-
-
-client.run('No token')
+client.run('no token')
