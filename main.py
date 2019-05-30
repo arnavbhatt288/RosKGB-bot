@@ -9,7 +9,6 @@ import pickle
 import sys
 import time
 import os
-import re
 from bugcheck import bugdict
 from discord.ext import commands
 from discord.utils import get
@@ -226,7 +225,7 @@ async def help(nes):
         colour = discord.Colour.blue()
     )
 
-    embed.set_author(name = 'RosKGB V2.0 - Commands')
+    embed.set_author(name = 'RosKGB V2.5 - Commands')
     embed.add_field(name = '$bugcheck <VALUE>', value = "Gives meaning of bugcheck codes.", inline = False)
     embed.add_field(name = '$blacklist <VALUE>', value = "(ONLY FOR ADMIN AND MODERATORS) Blacklists an user for usage of $pol and $unpol command.", inline = False)
     embed.add_field(name = '$unblacklist <VALUE>', value = "(ONLY FOR ADMIN AND MODERATORS) Unblacklists an user for usage of $pol and $unpol command.", inline = False)
