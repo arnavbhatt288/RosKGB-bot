@@ -1,6 +1,3 @@
-# id 574562317384024065
-# token NTc0NTYyMzE3Mzg0MDI0MDY1.XOFrlw.2VCyJ7NPZb3HLFKzUC_m1vbmRbc
-# https://discordapp.com/api/oauth2/authorize?client_id=574562317384024065&permissions=268503040&scope=bot
 
 import datetime
 import discord
