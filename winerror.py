@@ -5,4 +5,8 @@ obj = untangle.parse("error_codes/winerror.xml")
 windict = {}
 
 for Winerror in obj.WinerrorList.Winerror:
-    windict[Winerror['value']] = Winerror['text']
+    strValue = 8 - len(Winerror['value'])
+        
+    errorCode = "0" * strValue + Winerror['value']
+    
+    windict[errorCode] = Winerror['text']

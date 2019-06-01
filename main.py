@@ -1,8 +1,10 @@
 
+import configparser
 import datetime
 import discord
 import logging
 import pickle
+import signal
 import sys
 import time
 import os
@@ -13,19 +15,35 @@ from mmresult import mmdict
 from ntstatus import ntdict
 from hresult import hrdict
 from winerror import windict
-client = commands.Bot(command_prefix = '$')
-client.remove_command('help')
+from wm import wmdict
+client = commands.Bot(command_prefix = "$")
+client.remove_command("help")
 
-logger = logging.getLogger('discord')
+logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
+handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
 
+# Loading necessary files
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+token = config["CREDENTIALS"]["TOKEN"]
+server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
+
 with open("blacklist.dat", "rb") as blacklist:
-    data = pickle.load(blacklist)
+    blacklisted = pickle.load(blacklist)
 
 # Start of the bot
+
+def ownerShutdown(signal, frame):
+    with open("blacklist.dat", "wb") as blacklist:
+        pickle.dump(blacklisted, blacklist)
+
+    print(f"\nShutting down...")
+    time.sleep(3)
+    sys.exit(0)
 
 @client.event
 async def on_ready():
@@ -46,12 +64,12 @@ async def on_message(message):
 
 @client.command(pass_context = True)
 async def bugcheck(nes, value: str):
-    if any(c in value for c in 'x'):
+    if any(c in value for c in "x"):
         value = value[2:]
 
     if len(value) < 8:
         strValue = 8 - len(value)
-        value = '0' * strValue + value
+        value = "0" * strValue + value
 
     if value in bugdict:
         await nes.send("The meaning of this error code is - `{}`" .format(bugdict[value]))
@@ -61,12 +79,12 @@ async def bugcheck(nes, value: str):
 
 @client.command(pass_context = True)
 async def hresult(nes, value: str):
-    if any(c in value for c in 'x'):
+    if any(c in value for c in "x"):
         value = value[2:]
 
     if len(value) < 8:
         strValue = 8 - len(value)
-        value = '0' * strValue + value
+        value = "0" * strValue + value
 
     if value in hrdict:
         await nes.send("The meaning of this error code is - `{}`" .format(hrdict[value]))
@@ -76,15 +94,13 @@ async def hresult(nes, value: str):
 
 @client.command(pass_context = True)
 async def mmresult(nes, value: str):
-    if any(c in value for c in 'x'):
+    if any(c in value for c in "x"):
         value = value[2:]
-
-    if value.count("0") > 1:
-        while len(value) != 0:
-            value = value.lstrip('0')
-            if len(value) == 2 or len(value) == 1:
-                break
-
+    
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = "0" * strValue + value
+    
     if value in mmdict:
         await nes.send("The meaning of this error code is - `{}`" .format(mmdict[value]))
 
@@ -93,12 +109,12 @@ async def mmresult(nes, value: str):
 
 @client.command(pass_context = True)
 async def ntstatus(nes, value: str):
-    if any(c in value for c in 'x'):
+    if any(c in value for c in "x"):
         value = value[2:]
 
     if len(value) < 8:
         strValue = 8 - len(value)
-        value = '0' * strValue + value
+        value = "0" * strValue + value
 
     if value in ntdict:
         await nes.send("The meaning of this error code is - `{}`" .format(ntdict[value]))
@@ -108,14 +124,12 @@ async def ntstatus(nes, value: str):
 
 @client.command(pass_context = True)
 async def winerror(nes, value: str):
-    if any(c in value for c in 'x'):
+    if any(c in value for c in "x"):
         value = value[2:]
 
-    if value.count("0") > 1:
-        while len(value) != 0:
-            value = value.lstrip('0')
-            if len(value) == 2 or len(value) == 1:
-                break
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = "0" * strValue + value
 
     if value in windict:
         await nes.send("The meaning of this error code is - `{}`" .format(windict[value]))
@@ -123,17 +137,32 @@ async def winerror(nes, value: str):
     else:
         await nes.send(f"Error code not found! Please check the code and try again.")
 
+@client.command(pass_context = True)
+async def wm(nes, value: str):
+    if any(c in value for c in "x"):
+        value = value[2:]
+
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = "0" * strValue + value
+
+    if value in wmdict:
+        await nes.send("The meaning of this error code is - `{}`" .format(wmdict[value]))
+
+    else:
+        await nes.send(f"Error code not found! Please check the code and try again.")
+
 # Server commands
 
 @client.command(pass_context = True)
-@commands.has_any_role('Admins', 'Moderators')
+@commands.has_any_role("Admins", "Moderators")
 async def blacklist(nes, value: str):
     if len(value) == 18 and value.isdigit():
-        if value in data:
+        if value in blacklisted:
             await nes.send(f"User already exists!")
 
         else:
-            data.append(value)
+            blacklisted.append(value)
             await nes.send(f"User blacklisted.")
 
     else:
@@ -145,7 +174,8 @@ async def pol(nes):
     id = str(nes.message.author.id)
     role = get(author.guild.roles, name = "Politics")
 
-    if id in data:
+    if id in blacklisted:
+        await nes.send(f"Sorry, you have been blacklisted.")
         return
 
     elif role in author.roles:
@@ -156,11 +186,11 @@ async def pol(nes):
         await nes.send(f"Role assigned to you.")
 
 @client.command(pass_context = True)
-@commands.has_any_role('Admins', 'Moderators')
+@commands.has_any_role("Admins", "Moderators")
 async def unblacklist(nes, value: str):
     if len(value) == 18 and value.isdigit():
-        if value in data:
-            data.remove(value)
+        if value in blacklisted:
+            blacklisted.remove(value)
             await nes.send(f"User unblacklisted.")
 
         else:
@@ -175,7 +205,8 @@ async def unpol(nes):
     id = str(nes.message.author.id)
     role = get(author.guild.roles, name = "Politics")
 
-    if id in data:
+    if id in blacklisted:
+        await nes.send(f"Sorry, you have been blacklisted.")
         return
 
     elif not role in author.roles:
@@ -189,11 +220,11 @@ async def unpol(nes):
 
 @client.command(pass_context = True)
 async def shutdown(nes):
-    if str(nes.message.author.id) == "confidential" or str(nes.message.author.id) == "confidential":
+    if str(nes.message.author.id) == server_owner_id:
         with open("blacklist.dat", "wb") as blacklist:
-            pickle.dump(data, blacklist)
+            pickle.dump(blacklisted, blacklist)
 
-        await nes.send(f"Shutting down.")
+        await nes.send(f"Shutting down...")
         time.sleep(3)
         sys.exit(0)
 
@@ -202,11 +233,11 @@ async def shutdown(nes):
 
 @client.command(pass_context = True)
 async def reboot(nes):
-    if str(nes.message.author.id) == "confidential" or str(nes.message.author.id) == "confidential":
+    if str(nes.message.author.id) == server_owner_id:
         with open("blacklist.dat", "wb") as blacklist:
-            pickle.dump(data, blacklist)
+            pickle.dump(blacklisted, blacklist)
 
-        await nes.send(f"Rebooting.")
+        await nes.send(f"Rebooting...")
         time.sleep(3)
         python = sys.executable
         os.execl(python, python, *sys.argv)
@@ -217,22 +248,27 @@ async def reboot(nes):
 # Other commands
 
 @client.command(pass_context = True)
+async def about(nes):
+    await nes.send("RosKGB V2.5\nCopyright 2019 Arnav Bhatt (arnavbhatt288). Proudly hosted by Cernodile.")
+
+@client.command(pass_context = True)
 async def help(nes):
     embed = discord.Embed(
         colour = discord.Colour.blue()
     )
 
-    embed.set_author(name = 'RosKGB V2.5 - Commands')
-    embed.add_field(name = '$bugcheck <VALUE>', value = "Gives meaning of bugcheck codes.", inline = False)
-    embed.add_field(name = '$blacklist <VALUE>', value = "(ONLY FOR ADMIN AND MODERATORS) Blacklists an user for usage of $pol and $unpol command.", inline = False)
-    embed.add_field(name = '$unblacklist <VALUE>', value = "(ONLY FOR ADMIN AND MODERATORS) Unblacklists an user for usage of $pol and $unpol command.", inline = False)
-    embed.add_field(name = '$hi', value = "Says hello world to you.", inline = False)
-    embed.add_field(name = '$hresult <VALUE>', value = "Gives meaning of hresult codes.", inline = False)
-    embed.add_field(name = '$mmresult <VALUE>', value = "Gives meaning of mmresult codes.", inline = False)
-    embed.add_field(name = '$ntstatus <VALUE>', value = "Gives meaning of ntstatus codes.", inline = False)
-    embed.add_field(name = '$pol', value = "Gives Politics role to you.", inline = False)
-    embed.add_field(name = '$unpol', value = "Removes Politics role from you.", inline = False)
-    embed.add_field(name = '$winerror <VALUE>', value = "Gives meaning of winerror codes.", inline = False)
+    embed.set_author(name = "RosKGB V2.5 - Commands")
+    embed.add_field(name = "$bugcheck <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+    embed.add_field(name = "$blacklist <VALUE>", value = "(ONLY FOR ADMIN AND MODERATORS) Blacklists an user for usage of $pol and $unpol command.", inline = False)
+    embed.add_field(name = "$unblacklist <VALUE>", value = "(ONLY FOR ADMIN AND MODERATORS) Unblacklists an user for usage of $pol and $unpol command.", inline = False)
+    embed.add_field(name = "$hi", value = "Says hello world to you.", inline = False)
+    embed.add_field(name = "$hresult <VALUE>", value = "Gives meaning of hresult codes.", inline = False)
+    embed.add_field(name = "$mmresult <VALUE>", value = "Gives meaning of mmresult codes.", inline = False)
+    embed.add_field(name = "$ntstatus <VALUE>", value = "Gives meaning of ntstatus codes.", inline = False)
+    embed.add_field(name = "$pol", value = "Gives Politics role to you.", inline = False)
+    embed.add_field(name = "$unpol", value = "Removes Politics role from you.", inline = False)
+    embed.add_field(name = "$winerror <VALUE>", value = "Gives meaning of Win32 error codes.", inline = False)
+    embed.add_field(name = "$wm <VALUE>", value = "Gives meaning of WindowMessage codes.", inline = False)
     await nes.send(embed = embed)
 
 @client.command(pass_context = True)
@@ -240,5 +276,8 @@ async def hi(nes):
     author = nes.message.author.mention
     await nes.send("{} Hello World!" .format(author))
 
+# Other stuffs
 
-client.run('No token.')
+signal.signal(signal.SIGINT, ownerShutdown)
+
+client.run(token)
