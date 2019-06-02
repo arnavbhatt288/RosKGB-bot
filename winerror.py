@@ -6,7 +6,6 @@ windict = {}
 
 for Winerror in obj.WinerrorList.Winerror:
     strValue = 8 - len(Winerror['value'])
-        
     errorCode = "0" * strValue + Winerror['value']
-    
+
     windict[errorCode] = Winerror['text']

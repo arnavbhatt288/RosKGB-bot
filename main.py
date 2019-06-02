@@ -26,14 +26,22 @@ handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # Loading necessary files
+if os.path.isfile("files/config.ini"):
+    config = configparser.ConfigParser()
+    config.read("files/config.ini")
+    token = config["CREDENTIALS"]["TOKEN"]
+    server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
 
-config = configparser.ConfigParser()
-config.read("config.ini")
-token = config["CREDENTIALS"]["TOKEN"]
-server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
+else:
+    print("config.ini either deleted or corrupted! Please check and try again.")
+    sys.exit(0)
 
-with open("blacklist.dat", "rb") as blacklist:
-    blacklisted = pickle.load(blacklist)
+if os.path.isfile("files/blacklist.dat"):
+    with open("files/blacklist.dat", "rb") as blacklist:
+        blacklisted = pickle.load(blacklist)
+
+else:
+    print("blacklist.dat is either deleted or corrupted! Please check and try again")
 
 # Start of the bot
 
@@ -96,11 +104,11 @@ async def hresult(nes, value: str):
 async def mmresult(nes, value: str):
     if any(c in value for c in "x"):
         value = value[2:]
-    
+
     if len(value) < 8:
         strValue = 8 - len(value)
         value = "0" * strValue + value
-    
+
     if value in mmdict:
         await nes.send("The meaning of this error code is - `{}`" .format(mmdict[value]))
 
@@ -167,6 +175,13 @@ async def blacklist(nes, value: str):
 
     else:
         await nes.send(f"Invalid User ID! Please try again.")
+
+@client.command(pass_context = True)
+async def listblacklist(nes):
+    listBlacklist = str(blacklisted)[1:-1]
+
+    await nes.send(f"List of User IDs blacklisted - ")
+    await nes.send("`{}`" .format(listBlacklist))
 
 @client.command(pass_context = True)
 async def pol(nes):
