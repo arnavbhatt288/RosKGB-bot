@@ -37,21 +37,17 @@ else:
     sys.exit(0)
 
 if os.path.isfile("files/blacklist.dat"):
-    with open("files/blacklist.dat", "rb") as blacklist:
-        blacklisted = pickle.load(blacklist)
+    try:
+        with open("files/blacklist.dat", "rb") as blacklist:
+            blacklisted = pickle.load(blacklist)
+
+    except EOFError:
+        blacklisted = []
 
 else:
     print("blacklist.dat is either deleted or corrupted! Please check and try again")
 
 # Start of the bot
-
-def ownerShutdown(signal, frame):
-    with open("blacklist.dat", "wb") as blacklist:
-        pickle.dump(blacklisted, blacklist)
-
-    print(f"\nShutting down...")
-    time.sleep(3)
-    sys.exit(0)
 
 @client.event
 async def on_ready():
@@ -180,8 +176,12 @@ async def blacklist(nes, value: str):
 async def listblacklist(nes):
     listBlacklist = str(blacklisted)[1:-1]
 
-    await nes.send(f"List of User IDs blacklisted - ")
-    await nes.send("`{}`" .format(listBlacklist))
+    if not blacklisted:
+        await nes.send(f"No one is blacklisted.")
+
+    else:
+        await nes.send(f"List of User IDs blacklisted - ")
+        await nes.send("`{}`" .format(listBlacklist))
 
 @client.command(pass_context = True)
 async def pol(nes):
@@ -231,12 +231,20 @@ async def unpol(nes):
         await author.remove_roles(role)
         await nes.send(f"Role removed from you.")
 
-# Bot commands only accessible by bot creator and owner of server
+# Bot commands only accessible by owner of server
+
+def ownerShutdown(signal, frame):
+    with open("files/blacklist.dat", "wb") as blacklist:
+        pickle.dump(blacklisted, blacklist)
+
+    print(f"\nShutting down...")
+    time.sleep(3)
+    sys.exit(0)
 
 @client.command(pass_context = True)
 async def shutdown(nes):
     if str(nes.message.author.id) == server_owner_id:
-        with open("blacklist.dat", "wb") as blacklist:
+        with open("files/blacklist.dat", "wb") as blacklist:
             pickle.dump(blacklisted, blacklist)
 
         await nes.send(f"Shutting down...")
