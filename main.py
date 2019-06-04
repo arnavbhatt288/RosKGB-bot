@@ -296,6 +296,7 @@ async def help(nes):
     embed.add_field(name = "$mmresult <VALUE>", value = "Gives meaning of mmresult codes.", inline = False)
     embed.add_field(name = "$ntstatus <VALUE>", value = "Gives meaning of ntstatus codes.", inline = False)
     embed.add_field(name = "$pol", value = "Gives Politics role to you.", inline = False)
+    embed.add_field(name = "$quote", value = "Gives some random quote to you.", inline = False)
     embed.add_field(name = "$unpol", value = "Removes Politics role from you.", inline = False)
     embed.add_field(name = "$winerror <VALUE>", value = "Gives meaning of Win32 error codes.", inline = False)
     embed.add_field(name = "$wm <VALUE>", value = "Gives meaning of WindowMessage codes.", inline = False)
