@@ -4,6 +4,7 @@ import datetime
 import discord
 import logging
 import pickle
+import random
 import signal
 import sys
 import time
@@ -45,8 +46,14 @@ if os.path.isfile("files/blacklist.dat"):
         blacklisted = []
 
 else:
-    print("blacklist.dat is either deleted or corrupted! Please check and try again")
+    print("blacklist.dat is either deleted or corrupted! Please check and try again.")
 
+if os.path.isfile("files/quotes.txt"):
+    with open("files/quotes.txt") as quotes:
+        quoteData = quotes.readlines()
+
+else:
+    print("quotes.txt is either deleted or corrupted! Please check and try again.")
 # Start of the bot
 
 @client.event
@@ -298,6 +305,11 @@ async def help(nes):
 async def hi(nes):
     author = nes.message.author.mention
     await nes.send("{} Hello World!" .format(author))
+
+@client.command(pass_context = True)
+async def quote(nes):
+    quotes = random.choice(quoteData)
+    await nes.send("{}" .format(quotes))
 
 # Other stuffs
 
