@@ -1,4 +1,5 @@
 
+import asyncio
 import configparser
 import datetime
 import discord
@@ -10,6 +11,7 @@ import sys
 import time
 import os
 from bugcheck import bugdict
+from discord import FFmpegPCMAudio
 from discord.ext import commands
 from discord.utils import get
 from mmresult import mmdict
@@ -32,6 +34,8 @@ if os.path.isfile("files/config.ini"):
     config.read("files/config.ini")
     token = config["CREDENTIALS"]["TOKEN"]
     server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
+    quote_channel_id = config["CHANNELIDS"]["QUOTE"]
+    voice_channel_id = config["CHANNELIDS"]["VOICE"]
 
 else:
     print("config.ini either deleted or corrupted! Please check and try again.")
@@ -48,12 +52,24 @@ if os.path.isfile("files/blacklist.dat"):
 else:
     print("blacklist.dat is either deleted or corrupted! Please check and try again.")
 
+if os.path.isfile("files/voice_blacklist.dat"):
+    try:
+        with open("files/voice_blacklist.dat", "rb") as blacklist:
+            voice_blacklisted = pickle.load(blacklist)
+
+    except EOFError:
+        voice_blacklisted = []
+
+else:
+    print("voice_blacklist.dat is either deleted or corrupted! Please check and try again.")
+
 if os.path.isfile("files/quotes.txt"):
     with open("files/quotes.txt") as quotes:
         quoteData = quotes.readlines()
 
 else:
     print("quotes.txt is either deleted or corrupted! Please check and try again.")
+
 # Start of the bot
 
 @client.event
@@ -73,8 +89,8 @@ async def on_message(message):
 
 # Error code commands
 
-@client.command(pass_context = True)
-async def bugcheck(nes, value: str):
+@client.command(pass_context = True, aliases = ["bugcheck", "bc"])
+async def buc(nes, value: str):
     if any(c in value for c in "x"):
         value = value[2:]
 
@@ -88,8 +104,8 @@ async def bugcheck(nes, value: str):
     else:
         await nes.send(f"Error code not found! Please check the code and try again.")
 
-@client.command(pass_context = True)
-async def hresult(nes, value: str):
+@client.command(pass_context = True, aliases = ["hresult", "hr"])
+async def hre(nes, value: str):
     if any(c in value for c in "x"):
         value = value[2:]
 
@@ -103,8 +119,8 @@ async def hresult(nes, value: str):
     else:
         await nes.send(f"Error code not found! Please check the code and try again.")
 
-@client.command(pass_context = True)
-async def mmresult(nes, value: str):
+@client.command(pass_context = True, aliases = ["mmresult", "mm"])
+async def mmr(nes, value: str):
     if any(c in value for c in "x"):
         value = value[2:]
 
@@ -118,8 +134,8 @@ async def mmresult(nes, value: str):
     else:
         await nes.send(f"Error code not found! Please check the code and try again.")
 
-@client.command(pass_context = True)
-async def ntstatus(nes, value: str):
+@client.command(pass_context = True, aliases = ["ntresult", "nt"])
+async def ntr(nes, value: str):
     if any(c in value for c in "x"):
         value = value[2:]
 
@@ -133,8 +149,8 @@ async def ntstatus(nes, value: str):
     else:
         await nes.send(f"Error code not found! Please check the code and try again.")
 
-@client.command(pass_context = True)
-async def winerror(nes, value: str):
+@client.command(pass_context = True, aliases = ["winerror", "we"])
+async def wie(nes, value: str):
     if any(c in value for c in "x"):
         value = value[2:]
 
@@ -148,8 +164,8 @@ async def winerror(nes, value: str):
     else:
         await nes.send(f"Error code not found! Please check the code and try again.")
 
-@client.command(pass_context = True)
-async def wm(nes, value: str):
+@client.command(pass_context = True, aliases = ["windowmessage", "wm"])
+async def wme(nes, value: str):
     if any(c in value for c in "x"):
         value = value[2:]
 
@@ -167,28 +183,55 @@ async def wm(nes, value: str):
 
 @client.command(pass_context = True)
 @commands.has_any_role("Admins", "Moderators")
-async def blacklist(nes, value: str):
+async def blacklist(nes, type_: str, value: str):
     if len(value) == 18 and value.isdigit():
         if value in blacklisted:
             await nes.send(f"User already exists!")
 
         else:
-            blacklisted.append(value)
-            await nes.send(f"User blacklisted.")
+            if type_ == "pol":
+                blacklisted.append(value)
+                await nes.send(f"User blacklisted.")
+
+            elif type_ == "voice":
+                voice_blacklisted.append(value)
+                await nes.send(f"User blacklisted.")
+
+            elif type_ == "both":
+                blacklisted.append(value)
+                voice_blacklisted.append(value)
+                await nes.send(f"User blacklisted.")
+
+            else:
+                await nes.send(f"Invalid choice! Please try again")
 
     else:
         await nes.send(f"Invalid User ID! Please try again.")
 
 @client.command(pass_context = True)
-async def listblacklist(nes):
+@commands.has_any_role("Admins", "Moderators")
+async def listblacklist(nes, type_: str):
     listBlacklist = str(blacklisted)[1:-1]
+    list_voiceBlacklist = str(voice_blacklisted)[1:-1]
 
-    if not blacklisted:
-        await nes.send(f"No one is blacklisted.")
+    if type_ == "pol":
+        if not blacklisted:
+            await nes.send(f"No one is blacklisted.")
+
+        else:
+            await nes.send(f"List of User IDs blacklisted - ")
+            await nes.send("`{}`" .format(listBlacklist))
+
+    elif type_ == "voice":
+        if not voice_blacklisted:
+            await nes.send(f"No one is blacklisted.")
+
+        else:
+            await nes.send(f"List of User IDs blacklisted - ")
+            await nes.send("`{}`" .format(list_voiceBlacklist))
 
     else:
-        await nes.send(f"List of User IDs blacklisted - ")
-        await nes.send("`{}`" .format(listBlacklist))
+        await nes.send(f"Invalid choice! Please try again")
 
 @client.command(pass_context = True)
 async def pol(nes):
@@ -209,11 +252,24 @@ async def pol(nes):
 
 @client.command(pass_context = True)
 @commands.has_any_role("Admins", "Moderators")
-async def unblacklist(nes, value: str):
+async def unblacklist(nes, type_: str, value: str):
     if len(value) == 18 and value.isdigit():
         if value in blacklisted:
-            blacklisted.remove(value)
-            await nes.send(f"User unblacklisted.")
+            if type_ == "pol":
+                blacklisted.remove(value)
+                await nes.send(f"User unblacklisted.")
+
+            elif type_ == "voice":
+                voice_blacklisted.remove(value)
+                await nes.send(f"User unblacklisted.")
+
+            elif type_ == "both":
+                blacklisted.remove(value)
+                voice_blacklisted.remove(value)
+                await nes.send(f"User unblacklisted.")
+
+            else:
+                await nes.send(f"Invalid choice! Please try again")
 
         else:
             await nes.send(f"User doesn't exist! Please try again.")
@@ -238,21 +294,126 @@ async def unpol(nes):
         await author.remove_roles(role)
         await nes.send(f"Role removed from you.")
 
+# Funny voice commands
+
+@client.command()
+async def atthis(nes):
+    author = nes.message.author
+    id = str(nes.message.author.id)
+    
+    if voice_channel_id == str(nes.message.channel.id):
+        if id in voice_blacklisted:
+            await nes.send(f"Sorry, you have been blacklisted.")
+            return
+    
+        elif nes.voice_client is None:
+            if nes.author.voice:
+                voice = await author.voice.channel.connect()
+                voice.play(discord.FFmpegPCMAudio("files/atthis.mp3"))
+                counter = 0
+                duration = 4
+                while not counter >= duration:
+                    await asyncio.sleep(1)
+                    counter = counter + 1
+                await voice.disconnect()
+
+            else:
+                await nes.send(f"You are not in a voice channel!")
+
+        else:
+            await nes.send(f"Someone is already using a voice command!")
+
+@client.command()
+async def die(nes):
+    author = nes.message.author
+    id = str(nes.message.author.id)
+    
+    if voice_channel_id == str(nes.message.channel.id):
+        if id in voice_blacklisted:
+            await nes.send(f"Sorry, you have been blacklisted.")
+            return
+    
+        elif nes.voice_client is None:
+            if nes.author.voice:
+                voice = await author.voice.channel.connect()
+                voice.play(discord.FFmpegPCMAudio("files/die.mp3"))
+                counter = 0
+                duration = 1
+                while not counter >= duration:
+                    await asyncio.sleep(1)
+                    counter = counter + 1
+                await voice.disconnect()
+
+            else:
+                await nes.send(f"You are not in a voice channel!")
+
+        else:
+            await nes.send(f"Someone is already using a voice command!")
+
+@client.command()
+async def oof(nes):
+    author = nes.message.author
+    id = str(nes.message.author.id)
+    
+    if voice_channel_id == str(nes.message.channel.id):
+        if id in voice_blacklisted:
+            await nes.send(f"Sorry, you have been blacklisted.")
+            return
+    
+        elif nes.voice_client is None:
+            if nes.author.voice:
+                voice = await author.voice.channel.connect()
+                voice.play(discord.FFmpegPCMAudio("files/oof.mp3"))
+                counter = 0
+                duration = 1
+                while not counter >= duration:
+                    await asyncio.sleep(1)
+                    counter = counter + 1
+                await voice.disconnect()
+
+            else:
+                await nes.send(f"You are not in a voice channel!")
+
+        else:
+            await nes.send(f"Someone is already using a voice command!")
+
+@client.command()
+async def wwtt(nes):
+    author = nes.message.author
+    id = str(nes.message.author.id)
+    
+    if voice_channel_id == str(nes.message.channel.id):
+        if id in voice_blacklisted:
+            await nes.send(f"Sorry, you have been blacklisted.")
+            return
+    
+        elif nes.voice_client is None:
+            if nes.author.voice:
+                voice = await author.voice.channel.connect()
+                voice.play(discord.FFmpegPCMAudio("files/wwtt.mp3"))
+                counter = 0
+                duration = 1.5
+                while not counter >= duration:
+                    await asyncio.sleep(1)
+                    counter = counter + 1
+                await voice.disconnect()
+
+            else:
+                await nes.send(f"You are not in a voice channel!")
+
+        else:
+            await nes.send(f"Someone is already using a voice command!")
+
 # Bot commands only accessible by owner of server
-
-def ownerShutdown(signal, frame):
-    with open("files/blacklist.dat", "wb") as blacklist:
-        pickle.dump(blacklisted, blacklist)
-
-    print(f"\nShutting down...")
-    time.sleep(3)
-    sys.exit(0)
 
 @client.command(pass_context = True)
 async def shutdown(nes):
     if str(nes.message.author.id) == server_owner_id:
         with open("files/blacklist.dat", "wb") as blacklist:
             pickle.dump(blacklisted, blacklist)
+
+        with open("files/voice_blacklist.dat", "wb") as blacklist:
+            pickle.dump(voice_blacklisted, blacklist)
 
         await nes.send(f"Shutting down...")
         time.sleep(3)
@@ -264,8 +425,11 @@ async def shutdown(nes):
 @client.command(pass_context = True)
 async def reboot(nes):
     if str(nes.message.author.id) == server_owner_id:
-        with open("blacklist.dat", "wb") as blacklist:
+        with open("files/blacklist.dat", "wb") as blacklist:
             pickle.dump(blacklisted, blacklist)
+
+        with open("files/voice_blacklist.dat", "wb") as blacklist:
+            pickle.dump(voice_blacklisted, blacklist)
 
         await nes.send(f"Rebooting...")
         time.sleep(3)
@@ -282,25 +446,52 @@ async def about(nes):
     await nes.send("RosKGB V2.5\nCopyright 2019 Arnav Bhatt (arnavbhatt288). Proudly hosted by Cernodile.")
 
 @client.command(pass_context = True)
-async def help(nes):
+async def help(nes, value: str = None):
     embed = discord.Embed(
         colour = discord.Colour.blue()
     )
+    if not value:
+        embed.set_author(name = "RosKGB V2.5 - Help")
+        embed.add_field(name = "$help error_code", value = "Lists commands for the error codes.", inline = False)
+        embed.add_field(name = "$help server", value = "Lists commands for the server.", inline = False)
+        embed.add_field(name = "$help voice", value = "Lists commands for the voice.", inline = False)
+        embed.add_field(name = "$help other", value = "Lists commands for the voice.", inline = False)
+        await nes.send(embed = embed)
+    
+    elif value == "error_code":
+        embed.set_author(name = "RosKGB V2.5 - Help - Error Code")
+        embed.add_field(name = "$bc OR $bugcheck <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = "$hr OR $hresult <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = "$mm OR $ntstatus <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = "$we OR $winerror <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = "$wm OR $windowmessge <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        await nes.send(embed = embed)
 
-    embed.set_author(name = "RosKGB V2.5 - Commands")
-    embed.add_field(name = "$bugcheck <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-    embed.add_field(name = "$blacklist <VALUE>", value = "(ONLY FOR ADMIN AND MODERATORS) Blacklists an user for usage of $pol and $unpol command.", inline = False)
-    embed.add_field(name = "$unblacklist <VALUE>", value = "(ONLY FOR ADMIN AND MODERATORS) Unblacklists an user for usage of $pol and $unpol command.", inline = False)
-    embed.add_field(name = "$hi", value = "Says hello world to you.", inline = False)
-    embed.add_field(name = "$hresult <VALUE>", value = "Gives meaning of hresult codes.", inline = False)
-    embed.add_field(name = "$mmresult <VALUE>", value = "Gives meaning of mmresult codes.", inline = False)
-    embed.add_field(name = "$ntstatus <VALUE>", value = "Gives meaning of ntstatus codes.", inline = False)
-    embed.add_field(name = "$pol", value = "Gives Politics role to you.", inline = False)
-    embed.add_field(name = "$quote", value = "Gives some random quote to you.", inline = False)
-    embed.add_field(name = "$unpol", value = "Removes Politics role from you.", inline = False)
-    embed.add_field(name = "$winerror <VALUE>", value = "Gives meaning of Win32 error codes.", inline = False)
-    embed.add_field(name = "$wm <VALUE>", value = "Gives meaning of WindowMessage codes.", inline = False)
-    await nes.send(embed = embed)
+    elif value == "server":
+        embed.set_author(name = "RosKGB V2.5 - Help - Server")
+        embed.add_field(name = "$blacklist <ID>", value = "Blacklists the user from using $pol, $unpol and voice commands (FOR OWNER AND MODERATORS ONLY).", inline = False)
+        embed.add_field(name = "$listblacklist", value = "Lists the user ids blacklisted (FOR OWNER AND MODERATORS ONLY).", inline = False)
+        embed.add_field(name = "$pol", value = "Gives politics role to you.", inline = False)
+        embed.add_field(name = "$unblacklist <ID>", value = "Unblacklists the user from using $pol or voice commands (FOR OWNER AND MODERATORS ONLY).", inline = False)               
+        embed.add_field(name = "$unpol", value = "Removes politics role from you.", inline = False)
+        await nes.send(embed = embed)
+
+    elif value == "voice":
+        embed.set_author(name = "RosKGB V2.5 - Help - Voice")
+        embed.add_field(name = "$atthis", value = "Plays atthis.mp3.", inline = False)
+        embed.add_field(name = "$die", value = "Plays die.mp3.", inline = False)
+        embed.add_field(name = "$oof", value = "Plays oof.mp3.", inline = False)
+        embed.add_field(name = "$wwtt", value = "Plays wwtt.mp3.", inline = False)
+        await nes.send(embed = embed)
+
+    elif value == "other":
+        embed.set_author(name = "RosKGB V2.5 - Help - Other")
+        embed.add_field(name = "$hi", value = "Says hello world to you.", inline = False)
+        embed.add_field(name = "$quote", value = "Gives some random quote to you.", inline = False)
+        await nes.send(embed = embed)
+
+    else:
+        await nes.send(f"Invalid choice! Please try again")
 
 @client.command(pass_context = True)
 async def hi(nes):
@@ -309,11 +500,10 @@ async def hi(nes):
 
 @client.command(pass_context = True)
 async def quote(nes):
-    quotes = random.choice(quoteData)
-    await nes.send("{}" .format(quotes))
+    if quote_channel_id == str(nes.message.channel.id):
+        quotes = random.choice(quoteData)
+        await nes.send("{}" .format(quotes))
 
 # Other stuffs
-
-signal.signal(signal.SIGINT, ownerShutdown)
 
 client.run(token)
