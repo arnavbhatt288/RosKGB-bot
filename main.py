@@ -84,8 +84,19 @@ async def on_message(message):
 
     file.write(str(today) + f" {message.channel}: {message.author}: {message.content}\n")
     file.close()
-    
+
     await client.process_commands(message)
+
+def ownerShutdown(signum, frame):
+    with open("files/blacklist.dat", "wb") as blacklist:
+        pickle.dump(blacklisted, blacklist)
+
+    with open("files/voice_blacklist.dat", "wb") as voice_blacklist:
+        pickle.dump(voice_blacklisted, voice_blacklist)
+
+    print(f"\nShutting down...")
+    time.sleep(3)
+    sys.exit(0)
 
 # Error code commands
 
@@ -300,12 +311,12 @@ async def unpol(nes):
 async def atthis(nes):
     author = nes.message.author
     id = str(nes.message.author.id)
-    
+
     if voice_channel_id == str(nes.message.channel.id):
         if id in voice_blacklisted:
             await nes.send(f"Sorry, you have been blacklisted.")
             return
-    
+
         elif nes.voice_client is None:
             if nes.author.voice:
                 voice = await author.voice.channel.connect()
@@ -327,12 +338,12 @@ async def atthis(nes):
 async def die(nes):
     author = nes.message.author
     id = str(nes.message.author.id)
-    
+
     if voice_channel_id == str(nes.message.channel.id):
         if id in voice_blacklisted:
             await nes.send(f"Sorry, you have been blacklisted.")
             return
-    
+
         elif nes.voice_client is None:
             if nes.author.voice:
                 voice = await author.voice.channel.connect()
@@ -354,12 +365,12 @@ async def die(nes):
 async def oof(nes):
     author = nes.message.author
     id = str(nes.message.author.id)
-    
+
     if voice_channel_id == str(nes.message.channel.id):
         if id in voice_blacklisted:
             await nes.send(f"Sorry, you have been blacklisted.")
             return
-    
+
         elif nes.voice_client is None:
             if nes.author.voice:
                 voice = await author.voice.channel.connect()
@@ -381,12 +392,12 @@ async def oof(nes):
 async def wwtt(nes):
     author = nes.message.author
     id = str(nes.message.author.id)
-    
+
     if voice_channel_id == str(nes.message.channel.id):
         if id in voice_blacklisted:
             await nes.send(f"Sorry, you have been blacklisted.")
             return
-    
+
         elif nes.voice_client is None:
             if nes.author.voice:
                 voice = await author.voice.channel.connect()
@@ -457,7 +468,7 @@ async def help(nes, value: str = None):
         embed.add_field(name = "$help voice", value = "Lists commands for the voice.", inline = False)
         embed.add_field(name = "$help other", value = "Lists commands for the voice.", inline = False)
         await nes.send(embed = embed)
-    
+
     elif value == "error_code":
         embed.set_author(name = "RosKGB V2.5 - Help - Error Code")
         embed.add_field(name = "$bc OR $bugcheck <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
@@ -505,5 +516,7 @@ async def quote(nes):
         await nes.send("{}" .format(quotes))
 
 # Other stuffs
+
+signal.signal(signal.SIGTSTP, ownerShutdown)
 
 client.run(token)
