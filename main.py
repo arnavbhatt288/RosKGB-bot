@@ -11,7 +11,6 @@ import traceback
 import os
 from discord.ext import commands
 from server import blacklisted
-from server import voice_blacklisted
 client = commands.Bot(command_prefix = "$")
 client.remove_command("help")
 
@@ -25,12 +24,13 @@ if os.path.isfile("files/config.ini"):
     config = configparser.ConfigParser()
     config.read("files/config.ini")
     token = config["CREDENTIALS"]["TOKEN"]
+    server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
 
 else:
     print("config.ini either deleted or corrupted! Please check and try again.")
     sys.exit(0)
 
-extensions = ["fun", "server", "voice", "error_code"]
+extensions = ["fun", "server", "error_code"]
 
 
 @client.event
@@ -52,9 +52,6 @@ def ownerShutdown(signum, frame):
     with open("files/blacklist.dat", "wb") as blacklist:
         pickle.dump(blacklisted, blacklist)
 
-    with open("files/voice_blacklist.dat", "wb") as voice_blacklist:
-        pickle.dump(voice_blacklisted, voice_blacklist)
-
     print(f"\nShutting down...")
     time.sleep(3)
     sys.exit(0)
@@ -64,9 +61,6 @@ async def shutdown(nes):
     if str(nes.message.author.id) == server_owner_id:
         with open("files/blacklist.dat", "wb") as blacklist:
             pickle.dump(blacklisted, blacklist)
-
-        with open("files/voice_blacklist.dat", "wb") as blacklist:
-            pickle.dump(voice_blacklisted, blacklist)
 
         await nes.send(f"Shutting down...")
         time.sleep(3)
@@ -80,9 +74,6 @@ async def reboot(nes):
     if str(nes.message.author.id) == server_owner_id:
         with open("files/blacklist.dat", "wb") as blacklist:
             pickle.dump(blacklisted, blacklist)
-
-        with open("files/voice_blacklist.dat", "wb") as blacklist:
-            pickle.dump(voice_blacklisted, blacklist)
 
         await nes.send(f"Rebooting...")
         time.sleep(3)
