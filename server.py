@@ -22,7 +22,7 @@ class serverCog(commands.Cog):
     @commands.command()
     @commands.has_any_role("Admins", "Moderators")
     async def blacklist(self, nes, user_id: str):
-        if len(user_id) == 18 and user_id.isdigit():
+        if len(user_id) > 16 or len(user_id) < 22 and user_id.isdigit():
             if user_id in blacklisted:
                 await nes.send(f"User already exists!")
 
@@ -42,7 +42,7 @@ class serverCog(commands.Cog):
         	await nes.send(f"No one is blacklisted.")
 
         else:
-            await nes.send("List of User IDs blacklisted -\n`{}`" .format(listBlacklist))
+            await nes.send("List of User IDs blacklisted - `{}`" .format(listBlacklist))
 
     @commands.command()
     @commands.has_any_role("Admins", "Moderators")

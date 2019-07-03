@@ -114,14 +114,6 @@ async def help(nes, value: str = None):
         embed.add_field(name = "$unpol", value = "Removes politics role from you.", inline = False)
         await nes.send(embed = embed)
 
-    elif value == "voice":
-        embed.set_author(name = "RosKGB V2.5 - Help - Voice")
-        embed.add_field(name = "$atthis", value = "Plays atthis.mp3.", inline = False)
-        embed.add_field(name = "$die", value = "Plays die.mp3.", inline = False)
-        embed.add_field(name = "$oof", value = "Plays oof.mp3.", inline = False)
-        embed.add_field(name = "$wwtt", value = "Plays wwtt.mp3.", inline = False)
-        await nes.send(embed = embed)
-
     elif value == "other":
         embed.set_author(name = "RosKGB V2.5 - Help - Other")
         embed.add_field(name = "$hi", value = "Says hello world to you.", inline = False)
