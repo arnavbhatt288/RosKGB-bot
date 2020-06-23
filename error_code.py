@@ -5,7 +5,7 @@ from discord.ext import commands
 class errorCog(commands.Cog):
     def __init__(self, client):
         self.client = client
-
+    
     @commands.command(aliases = ["bugcheck", "bc"])
     async def buc(self, nes, value: str):
         obj = untangle.parse("error_codes/bugcheck.xml")
@@ -15,13 +15,9 @@ class errorCog(commands.Cog):
         for BugCheck in obj.BugCheckList.BugCheck:
             bugdict[BugCheck['value']] = BugCheck['text']
 
-        if any(c in value for c in "x"):
-            value = value[2:]
+        value = adjustValue(value)
 
-        if len(value) < 8:
-            strValue = 8 - len(value)
-            value = "0" * strValue + value
-
+        print(value)
         if value in bugdict:
             await nes.send("The meaning of this error code is - `{}`" .format(bugdict[value]))
 
@@ -37,12 +33,7 @@ class errorCog(commands.Cog):
         for Hresult in obj.HresultList.Hresult:
             hrdict[Hresult['value']] = Hresult['text']
 
-        if any(c in value for c in "x"):
-            value = value[2:]
-
-        if len(value) < 8:
-            strValue = 8 - len(value)
-            value = "0" * strValue + value
+        value = adjustValue(value)
 
         if value in hrdict:
             await nes.send("The meaning of this error code is - `{}`" .format(hrdict[value]))
@@ -59,12 +50,7 @@ class errorCog(commands.Cog):
         for Mmresult in obj.MmresultList.Mmresult:
             mmdict[Mmresult['value']] = Mmresult['text']
 
-        if any(c in value for c in "x"):
-            value = value[2:]
-
-        if len(value) < 8:
-            strValue = 8 - len(value)
-            value = "0" * strValue + value
+        value = adjustValue(value)
 
         if value in mmdict:
             await nes.send("The meaning of this error code is - `{}`" .format(mmdict[value]))
@@ -81,12 +67,7 @@ class errorCog(commands.Cog):
         for Ntstatus in obj.NtstatusList.Ntstatus:
             ntdict[Ntstatus['value']] = Ntstatus['text']
 
-        if any(c in value for c in "x"):
-            value = value[2:]
-
-        if len(value) < 8:
-            strValue = 8 - len(value)
-            value = "0" * strValue + value
+        value = adjustValue(value)
 
         if value in ntdict:
             await nes.send("The meaning of this error code is - `{}`" .format(ntdict[value]))
@@ -94,7 +75,7 @@ class errorCog(commands.Cog):
         else:
             await nes.send(f"Error code not found! Please check the code and try again.")
 
-    @commands.command(aliases = ["winerror", "we"])
+    @commands.command(aliases = ["winerror", "win32"])
     async def wie(self, nes, value: str):
         obj = untangle.parse("error_codes/winerror.xml")
 
@@ -106,12 +87,7 @@ class errorCog(commands.Cog):
 
             windict[errorCode] = Winerror['text']
 
-        if any(c in value for c in "x"):
-            value = value[2:]
-
-        if len(value) < 8:
-            strValue = 8 - len(value)
-            value = "0" * strValue + value
+        value = adjustValue(value)
 
         if value in windict:
             await nes.send("The meaning of this error code is - `{}`" .format(windict[value]))
@@ -131,18 +107,25 @@ class errorCog(commands.Cog):
 
             wmdict[errorCode] = Wm['text']
 
-        if any(c in value for c in "x"):
-            value = value[2:]
-
-        if len(value) < 8:
-            strValue = 8 - len(value)
-            value = "0" * strValue + value
+        value = adjustValue(value)
 
         if value in wmdict:
             await nes.send("The meaning of this error code is - `{}`" .format(wmdict[value]))
 
         else:
             await nes.send(f"Error code not found! Please check the code and try again.")
+
+def adjustValue(value):
+    if any(c in value for c in "x"):
+        value = value[2:]
+
+    if len(value) < 8:
+        strValue = 8 - len(value)
+        value = "0" * strValue + value
+        
+    print(value)
+
+    return value
 
 def setup(client):
     client.add_cog(errorCog(client))

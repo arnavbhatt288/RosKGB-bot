@@ -3,15 +3,20 @@ import asyncio
 import configparser
 import datetime
 import logging
-import pickle
 import signal
 import sys
 import time
 import traceback
 import os
 from discord.ext import commands
-from server import blacklisted
-client = commands.Bot(command_prefix = "$")
+
+bot_prefix = "!"
+
+rules_channel_name = "#rules-info"
+readme_channel_name = "#readme"
+instructional_channel_name = "#instructions"
+
+client = commands.Bot(command_prefix = bot_prefix)
 client.remove_command("help")
 
 logger = logging.getLogger("discord")
@@ -20,17 +25,7 @@ handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w"
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
 
-if os.path.isfile("files/config.ini"):
-    config = configparser.ConfigParser()
-    config.read("files/config.ini")
-    token = config["CREDENTIALS"]["TOKEN"]
-    server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
-
-else:
-    print("config.ini either deleted or corrupted! Please check and try again.")
-    sys.exit(0)
-
-extensions = ["fun", "server", "error_code"]
+extensions = ["server", "error_code"]
 
 
 @client.event
@@ -48,20 +43,17 @@ async def on_message(message):
 
     await client.process_commands(message)
 
-def ownerShutdown(signum, frame):
-    with open("files/blacklist.dat", "wb") as blacklist:
-        pickle.dump(blacklisted, blacklist)
-
-    print(f"\nShutting down...")
-    time.sleep(3)
-    sys.exit(0)
+@client.event
+async def on_member_join(member):
+    for channel in member.guild.channels:
+        if channel.name == "general":
+            author = member.mention
+            server = member.guild.name
+            await channel.send(f"Hello {author} and welcome to the {server} server!\n\nPlease read the community server rules at {rules_channel_name}! If you want a general overview of what ReactOS is, please take a look at {readme_channel_name}! Are you confused about the server's channels or role management? Consult {instructional_channel_name}!")
 
 @client.command(pass_context = True)
 async def shutdown(nes):
     if str(nes.message.author.id) == server_owner_id:
-        with open("files/blacklist.dat", "wb") as blacklist:
-            pickle.dump(blacklisted, blacklist)
-
         await nes.send(f"Shutting down...")
         time.sleep(3)
         sys.exit(0)
@@ -72,9 +64,6 @@ async def shutdown(nes):
 @client.command(pass_context = True)
 async def reboot(nes):
     if str(nes.message.author.id) == server_owner_id:
-        with open("files/blacklist.dat", "wb") as blacklist:
-            pickle.dump(blacklisted, blacklist)
-
         await nes.send(f"Rebooting...")
         time.sleep(3)
         python = sys.executable
@@ -89,35 +78,27 @@ async def help(nes, value: str = None):
         colour = discord.Colour.blue()
     )
     if not value:
-        embed.set_author(name = "RosKGB V2.5 - Help")
-        embed.add_field(name = "$help error_code", value = "Lists commands for the error codes.", inline = False)
-        embed.add_field(name = "$help server", value = "Lists commands for the server.", inline = False)
-        embed.add_field(name = "$help voice", value = "Lists commands for the voice.", inline = False)
-        embed.add_field(name = "$help other", value = "Lists commands for the voice.", inline = False)
+        embed.set_author(name = "RosKGB V1.0 - Help")
+        embed.add_field(name = f"{bot_prefix}help error_code", value = "Lists commands for the error codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}help server", value = "Lists commands for the server.", inline = False)
         await nes.send(embed = embed)
 
     elif value == "error_code":
-        embed.set_author(name = "RosKGB V2.5 - Help - Error Code")
-        embed.add_field(name = "$bc OR $bugcheck <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-        embed.add_field(name = "$hr OR $hresult <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-        embed.add_field(name = "$mm OR $ntstatus <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-        embed.add_field(name = "$we OR $winerror <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-        embed.add_field(name = "$wm OR $windowmessge <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.set_author(name = "RosKGB V1.0 - Help - Error Code")
+        embed.add_field(name = f"{bot_prefix}bc OR {bot_prefix}bugcheck <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}hr OR {bot_prefix}hresult <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}mm OR {bot_prefix}multimedia <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+       	embed.add_field(name = f"{bot_prefix}nt OR {bot_prefix}ntresult  <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}win32 OR {bot_prefix}winerror <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}wm OR {bot_prefix}windowmessge <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
         await nes.send(embed = embed)
 
     elif value == "server":
-        embed.set_author(name = "RosKGB V2.5 - Help - Server")
-        embed.add_field(name = "$blacklist <ID>", value = "Blacklists the user from using $pol, $unpol and voice commands (FOR OWNER AND MODERATORS ONLY).", inline = False)
-        embed.add_field(name = "$listblacklist", value = "Lists the user ids blacklisted (FOR OWNER AND MODERATORS ONLY).", inline = False)
-        embed.add_field(name = "$pol", value = "Gives politics role to you.", inline = False)
-        embed.add_field(name = "$unblacklist <ID>", value = "Unblacklists the user from using $pol or voice commands (FOR OWNER AND MODERATORS ONLY).", inline = False)               
-        embed.add_field(name = "$unpol", value = "Removes politics role from you.", inline = False)
-        await nes.send(embed = embed)
-
-    elif value == "other":
-        embed.set_author(name = "RosKGB V2.5 - Help - Other")
-        embed.add_field(name = "$hi", value = "Says hello world to you.", inline = False)
-        embed.add_field(name = "$quote", value = "Gives some random quote to you.", inline = False)
+        embed.set_author(name = "RosKGB V1.0 - Help - Server")
+        embed.add_field(name = f"{bot_prefix}polban <ID>", value = f"Bans the user from using {bot_prefix}pol. (FOR ADMINS AND MODERATORS ONLY).", inline = False)
+        embed.add_field(name = f"{bot_prefix}listids", value = f"Lists the user ids banned for using {bot_prefix}pol. (FOR ADMINS AND MODERATORS ONLY).", inline = False)
+        embed.add_field(name = f"{bot_prefix}pol", value = "Gives politics role to you.", inline = False)
+        embed.add_field(name = f"{bot_prefix}polunban <ID>", value = f"Unbans the user from using {bot_prefix}pol. (FOR ADMINS AND MODERATORS ONLY).", inline = False)
         await nes.send(embed = embed)
 
     else:
@@ -131,6 +112,14 @@ if __name__ == "__main__":
             print(f"Failed to load extension {extension}.")
             traceback.print_exc()
 
-    signal.signal(signal.SIGTSTP, ownerShutdown)
+    if os.path.isfile("files/config.ini"):
+        config = configparser.ConfigParser()
+        config.read("files/config.ini")
+        token = config["CREDENTIALS"]["TOKEN"]
+        server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
+
+    else:
+        print("config.ini either deleted or corrupted! Please check and try again.")
+        sys.exit(0)
 
     client.run(token, bot = True, reconnect = True)
