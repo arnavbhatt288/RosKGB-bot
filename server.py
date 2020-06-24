@@ -39,11 +39,14 @@ class serverCog(commands.Cog):
         user_name = await nes.guild.fetch_member(id)
         pol_channel = self.client.get_channel(pol_channel_id)
         log_channel = self.client.get_channel(log_channel_id)
-
         role = get(user_name.guild.roles, name = politics_role)
-        if user_id in blacklisted:
-            await nes.send(f"User is already banned!")
 
+        if user_id in blacklisted:
+            await nes.send("User is already banned!")
+
+        elif user_name == author:
+            await nes.send("Don't just ban yourself you nullptr!")
+        
         else:
             if role in user_name.roles:
                 await user_name.remove_roles(role)
@@ -58,7 +61,7 @@ class serverCog(commands.Cog):
                     today = now.strftime("%H:%M:%S")
                     await channel.send(f"`[{today}]` :hammer: **{author}** restricted access to {pol_channel.mention} for **{user_name}** (ID:{user_id})")
 
-            await nes.send(f"{user_name} banned from accessing {pol_channel.mention} channel")
+            await nes.send(f"{user_name} is banned from accessing {pol_channel.mention} channel")
 
     @commands.command()
     @commands.has_any_role(admin_role, mod_role)
@@ -66,7 +69,7 @@ class serverCog(commands.Cog):
         listBlacklist = str(blacklisted)[1:-1]
 
         if not blacklisted:
-        	await nes.send(f"No one is banned.")
+        	await nes.send("No one is banned.")
 
         else:
             await nes.send(f"List of User IDs banned - `{listBlacklist}`")
@@ -91,40 +94,41 @@ class serverCog(commands.Cog):
                     today = now.strftime("%H:%M:%S")
                     await channel.send(f"`[{today}]` :white_check_mark: **{author}** unrestricted access to {pol_channel.mention} for **{user_name}** (ID:{user_id})")
 
-            await nes.send(f"{user_name} unbanned from accessing {pol_channel.mention} channel")
+            await nes.send(f"{user_name} is unbanned from accessing {pol_channel.mention} channel")
 
         else:
-            await nes.send(f"User doesn't exist! Please try again.")
+            await nes.send("User doesn't exist! Please try again.")
 
     @commands.command()
     async def pol(self, nes):
         author = nes.message.author
         id = str(nes.message.author.id)
         role = get(author.guild.roles, name = politics_role)
+        pol_channel = self.client.get_channel(pol_channel_id)
 
         if id in blacklisted:
-            await nes.send(f"Sorry, you have been banned from accessing #{pol_channel} channel.")
+            await nes.send(f"Sorry, you have been banned from accessing {pol_channel} channel.")
             return
 
         elif role in author.roles:
             await author.remove_roles(role)
-            await nes.send(f"Role removed from you.")
+            await nes.send("Role removed from you.")
 
         else:
             await author.add_roles(role)
-            await nes.send(f"Role assigned to you.")
+            await nes.send("Role assigned to you.")
 
     @polban.error
     async def polban_error(self, nes, error):
         error = getattr(error, "original", error)
         if isinstance(error,discord.NotFound):
-            await nes.send(f"Invalid User ID! Please try again.")
+            await nes.send("Invalid User ID! Please try again.")
 
     @polunban.error
     async def polunban_error(self, nes, error):
         error = getattr(error, "original", error)
         if isinstance(error,discord.NotFound):
-            await nes.send(f"Invalid User ID! Please try again.")
+            await nes.send("Invalid User ID! Please try again.")
 
 def setup(client):
     client.add_cog(serverCog(client))

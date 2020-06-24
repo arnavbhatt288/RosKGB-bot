@@ -55,7 +55,7 @@ async def on_member_join(member):
 @client.command(pass_context = True)
 async def shutdown(nes):
     if str(nes.message.author.id) == server_owner_id:
-        await nes.send(f"Shutting down...")
+        await nes.send("Shutting down...")
         time.sleep(3)
         sys.exit(0)
 
@@ -65,7 +65,7 @@ async def shutdown(nes):
 @client.command(pass_context = True)
 async def reboot(nes):
     if str(nes.message.author.id) == server_owner_id:
-        await nes.send(f"Rebooting...")
+        await nes.send("Rebooting...")
         time.sleep(3)
         python = sys.executable
         os.execl(python, python, *sys.argv)
@@ -103,7 +103,7 @@ async def help(nes, value: str = None):
         await nes.send(embed = embed)
 
     else:
-        await nes.send(f"Invalid choice! Please try again")
+        await nes.send("Invalid choice! Please try again")
 
 if __name__ == "__main__":
     for extension in extensions:

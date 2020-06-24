@@ -26,7 +26,7 @@ class errorCog(commands.Cog):
             await nes.send("The meaning of this error code is - `{}`" .format(bugdict[value]))
 
         else:
-            await nes.send(f"Error code not found! Please check the code and try again.")
+            await nes.send("Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["hresult", "hr"])
     async def hre(self, nes, value: str = None):
@@ -47,7 +47,7 @@ class errorCog(commands.Cog):
             await nes.send("The meaning of this error code is - `{}`" .format(hrdict[value]))
 
         else:
-            await nes.send(f"Error code not found! Please check the code and try again.")
+            await nes.send("Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["mmresult", "mm"])
     async def mmr(self, nes, value: str = None):
@@ -68,7 +68,7 @@ class errorCog(commands.Cog):
             await nes.send("The meaning of this error code is - `{}`" .format(mmdict[value]))
 
         else:
-            await nes.send(f"Error code not found! Please check the code and try again.")
+            await nes.send("Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["ntresult", "nt"])
     async def ntr(self, nes, value: str = None):
@@ -89,7 +89,7 @@ class errorCog(commands.Cog):
             await nes.send("The meaning of this error code is - `{}`" .format(ntdict[value]))
 
         else:
-            await nes.send(f"Error code not found! Please check the code and try again.")
+            await nes.send("Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["winerror", "win32"])
     async def wie(self, nes, value: str = None):
@@ -113,7 +113,7 @@ class errorCog(commands.Cog):
             await nes.send("The meaning of this error code is - `{}`" .format(windict[value]))
 
         else:
-            await nes.send(f"Error code not found! Please check the code and try again.")
+            await nes.send("Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["windowmessage", "wm"])
     async def wme(self, nes, value: str = None):
@@ -137,7 +137,7 @@ class errorCog(commands.Cog):
             await nes.send("The meaning of this error code is - `{}`" .format(wmdict[value]))
 
         else:
-            await nes.send(f"Error code not found! Please check the code and try again.")
+            await nes.send("Error code not found! Please check the code and try again.")
 
 def adjustValue(value):
     if any(c in value for c in "x"):
