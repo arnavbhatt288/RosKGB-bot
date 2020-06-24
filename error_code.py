@@ -7,7 +7,11 @@ class errorCog(commands.Cog):
         self.client = client
     
     @commands.command(aliases = ["bugcheck", "bc"])
-    async def buc(self, nes, value: str):
+    async def buc(self, nes, value: str = None):
+        if not value:
+            await nes.send("Enter the required error code!")
+            return
+
         obj = untangle.parse("error_codes/bugcheck.xml")
 
         bugdict = {}
@@ -25,7 +29,11 @@ class errorCog(commands.Cog):
             await nes.send(f"Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["hresult", "hr"])
-    async def hre(self, nes, value: str):
+    async def hre(self, nes, value: str = None):
+        if not value:
+            await nes.send("Enter the required error code!")
+            return
+
         obj = untangle.parse("error_codes/hresult.xml")
 
         hrdict = {}
@@ -42,7 +50,11 @@ class errorCog(commands.Cog):
             await nes.send(f"Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["mmresult", "mm"])
-    async def mmr(self, nes, value: str):
+    async def mmr(self, nes, value: str = None):
+        if not value:
+            await nes.send("Enter the required error code!")
+            return
+
         obj = untangle.parse("error_codes/mmresult.xml")
 
         mmdict = {}
@@ -59,7 +71,11 @@ class errorCog(commands.Cog):
             await nes.send(f"Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["ntresult", "nt"])
-    async def ntr(self, nes, value: str):
+    async def ntr(self, nes, value: str = None):
+        if not value:
+            await nes.send("Enter the required error code!")
+            return
+
         obj = untangle.parse("error_codes/ntstatus.xml")
 
         ntdict = {}
@@ -76,7 +92,11 @@ class errorCog(commands.Cog):
             await nes.send(f"Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["winerror", "win32"])
-    async def wie(self, nes, value: str):
+    async def wie(self, nes, value: str = None):
+        if not value:
+            await nes.send("Enter the required error code!")
+            return
+
         obj = untangle.parse("error_codes/winerror.xml")
 
         windict = {}
@@ -96,7 +116,11 @@ class errorCog(commands.Cog):
             await nes.send(f"Error code not found! Please check the code and try again.")
 
     @commands.command(aliases = ["windowmessage", "wm"])
-    async def wme(self, nes, value: str):
+    async def wme(self, nes, value: str = None):
+        if not value:
+            await nes.send("Enter the required error code!")
+            return
+
         obj = untangle.parse("error_codes/wm.xml")
 
         wmdict = {}
