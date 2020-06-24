@@ -41,11 +41,16 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
+    author = member.mention
+    server = member.guild.name
+    rules_channel = client.get_channel(rules_channel_id)
+    readme_channel = client.get_channel(readme_channel_id)
+    instructional_channel = client.get_channel(instructional_channel_id)
+    general_channel = client.get_channel(general_channel_id)
+
     for channel in member.guild.channels:
-        if channel.name == general_channel_name:
-            author = member.mention
-            server = member.guild.name
-            await channel.send(f"Hello {author} and welcome to the {server} server!\n\nPlease read the community server rules at #{rules_channel_name}! If you want a general overview of what ReactOS is, please take a look at #{readme_channel_name}! Are you confused about the server's channels or role management? Consult #{instructional_channel_name}!")
+        if channel == general_channel:
+            await channel.send(f"Hello {author} and welcome to the {server} server!\n\nPlease read the community server rules at {rules_channel.mention}! If you want a general overview of what ReactOS is, please take a look at {readme_channel.mention}! Are you confused about the server's channels or role management? Consult {instructional_channel.mention}!")
 
 @client.command(pass_context = True)
 async def shutdown(nes):
@@ -113,10 +118,10 @@ if __name__ == "__main__":
         config.read("files/config.ini")
         token = config["CREDENTIALS"]["TOKEN"]
         server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
-        general_channel_name = config["CHANNEL_NAMES"]["GENERAL"]
-        rules_channel_name = config["CHANNEL_NAMES"]["RULES"]
-        readme_channel_name = config["CHANNEL_NAMES"]["README"]
-        instructional_channel_name = config["CHANNEL_NAMES"]["INSTRUCTIONS"]
+        general_channel_id = int(config["CHANNEL_IDS"]["GENERAL"])
+        rules_channel_id = int(config["CHANNEL_IDS"]["RULES"])
+        readme_channel_id = int(config["CHANNEL_IDS"]["README"])
+        instructional_channel_id = int(config["CHANNEL_IDS"]["INSTRUCTIONS"])
 
     else:
         print("config.ini either deleted or corrupted! Please check and try again.")
