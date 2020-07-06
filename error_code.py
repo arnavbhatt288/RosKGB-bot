@@ -8,8 +8,8 @@ class errorCog(commands.Cog):
     
     @commands.command(aliases = ["bugcheck", "bc"])
     async def buc(self, nes, value: str = None):
-        if not value:
-            await nes.send("Enter the required error code!")
+        if(checkValue(value) == False):
+            await nes.send("Enter the valid error code!")
             return
 
         obj = untangle.parse("error_codes/bugcheck.xml")
@@ -18,10 +18,10 @@ class errorCog(commands.Cog):
 
         for BugCheck in obj.BugCheckList.BugCheck:
             bugdict[BugCheck['value']] = BugCheck['text']
-
+            
+        
         value = adjustValue(value)
 
-        print(value)
         if value in bugdict:
             await nes.send("The meaning of this error code is - `{}`" .format(bugdict[value]))
 
@@ -30,8 +30,8 @@ class errorCog(commands.Cog):
 
     @commands.command(aliases = ["hresult", "hr"])
     async def hre(self, nes, value: str = None):
-        if not value:
-            await nes.send("Enter the required error code!")
+        if(checkValue(value) == False):
+            await nes.send("Enter the valid error code!")
             return
 
         obj = untangle.parse("error_codes/hresult.xml")
@@ -51,8 +51,8 @@ class errorCog(commands.Cog):
 
     @commands.command(aliases = ["mmresult", "mm"])
     async def mmr(self, nes, value: str = None):
-        if not value:
-            await nes.send("Enter the required error code!")
+        if(checkValue(value) == False):
+            await nes.send("Enter the valid error code!")
             return
 
         obj = untangle.parse("error_codes/mmresult.xml")
@@ -72,8 +72,8 @@ class errorCog(commands.Cog):
 
     @commands.command(aliases = ["ntresult", "nt"])
     async def ntr(self, nes, value: str = None):
-        if not value:
-            await nes.send("Enter the required error code!")
+        if(checkValue(value) == False):
+            await nes.send("Enter the valid error code!")
             return
 
         obj = untangle.parse("error_codes/ntstatus.xml")
@@ -93,8 +93,8 @@ class errorCog(commands.Cog):
 
     @commands.command(aliases = ["winerror", "win32"])
     async def wie(self, nes, value: str = None):
-        if not value:
-            await nes.send("Enter the required error code!")
+        if(checkValue(value) == False):
+            await nes.send("Enter the valid error code!")
             return
 
         obj = untangle.parse("error_codes/winerror.xml")
@@ -117,8 +117,8 @@ class errorCog(commands.Cog):
 
     @commands.command(aliases = ["windowmessage", "wm"])
     async def wme(self, nes, value: str = None):
-        if not value:
-            await nes.send("Enter the required error code!")
+        if(checkValue(value) == False):
+            await nes.send("Enter the valid error code!")
             return
 
         obj = untangle.parse("error_codes/wm.xml")
@@ -150,6 +150,16 @@ def adjustValue(value):
     print(value)
 
     return value
+
+def checkValue(value):
+    invalid_chars = set("!@#$%^&*()-_=+/*-[];',.\|<>?}{`~")
+    if not value:
+        return False
+
+    elif any((c in invalid_chars) for c in value):
+        return False
+
+    return True
 
 def setup(client):
     client.add_cog(errorCog(client))
