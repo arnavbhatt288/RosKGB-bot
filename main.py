@@ -55,23 +55,27 @@ async def on_member_join(member):
 
 @client.command(pass_context = True)
 async def shutdown(nes):
-    if str(nes.message.author.id) == server_owner_id:
+    role = discord.utils.get(nes.guild.roles, name = admin_role)
+    if str(nes.message.author.id) == server_owner_id or role in nes.author.roles:
         await nes.send("Shutting down...")
         time.sleep(3)
         sys.exit(0)
 
     else:
+        await nes.send("You do not have enough permissions to shutdown the bot!")
         return
 
 @client.command(pass_context = True)
 async def reboot(nes):
-    if str(nes.message.author.id) == server_owner_id:
+    role = discord.utils.get(nes.guild.roles, name = admin_role)
+    if str(nes.message.author.id) == server_owner_id or role in nes.author.roles:
         await nes.send("Rebooting...")
         time.sleep(3)
         python = sys.executable
         os.execl(python, python, *sys.argv)
 
     else:
+        await nes.send("You do not have enough permissions to restart the bot!")
         return
 
 @client.command(pass_context = True)
@@ -119,6 +123,7 @@ if __name__ == "__main__":
         config.read("files/config.ini")
         token = config["CREDENTIALS"]["TOKEN"]
         server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
+        admin_role = config["ROLE_NAMES"]["ADMINISTRATOR"]
         general_channel_id = int(config["CHANNEL_IDS"]["GENERAL"])
         rules_channel_id = int(config["CHANNEL_IDS"]["RULES"])
         readme_channel_id = int(config["CHANNEL_IDS"]["README"])
