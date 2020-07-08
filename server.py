@@ -52,8 +52,6 @@ class serverCog(commands.Cog):
                 await user_name.remove_roles(role)
 
             blacklisted[user_id] = str(user_name)
-            with open("files/blacklist.dat", "wb") as blacklist:
-                pickle.dump(blacklisted, blacklist)
 
             for channel in author.guild.channels:
                 if channel == log_channel:
@@ -85,10 +83,9 @@ class serverCog(commands.Cog):
 
         if user_id in blacklisted:
             del blacklisted[user_id]
-            with open("files/blacklist.dat", "wb") as blacklist:
-                pickle.dump(blacklisted, blacklist)
 
             for channel in author.guild.channels:
+                print(channel)
                 if channel == log_channel:
                     now = datetime.utcnow()
                     today = now.strftime("%H:%M:%S")
@@ -121,13 +118,34 @@ class serverCog(commands.Cog):
     @polban.error
     async def polban_error(self, nes, error):
         error = getattr(error, "original", error)
-        if isinstance(error,discord.NotFound):
+        if isinstance(error, commands.MissingAnyRole):
+            await nes.send("You don't have sufficient role to use this command!")
+
+        elif isinstance(error,discord.NotFound):
+            await nes.send("Invalid User ID! Please try again.")
+
+        elif isinstance(error, commands.BadArgument):
             await nes.send("Invalid User ID! Please try again.")
 
     @polunban.error
     async def polunban_error(self, nes, error):
         error = getattr(error, "original", error)
-        if isinstance(error,discord.NotFound):
+        if isinstance(error, commands.MissingAnyRole):
+            await nes.send("You don't have sufficient role to use this command!")
+
+        elif isinstance(error,discord.NotFound):
+            await nes.send("Invalid User ID! Please try again.")
+
+        elif isinstance(error, commands.BadArgument):
+            await nes.send("Invalid User ID! Please try again.")
+
+    @listids.error
+    async def polunban_error(self, nes, error):
+        error = getattr(error, "original", error)
+        if isinstance(error, commands.MissingAnyRole):
+            await nes.send("You don't have sufficient role to use this command!")
+
+        elif isinstance(error, commands.BadArgument):
             await nes.send("Invalid User ID! Please try again.")
 
 def setup(client):

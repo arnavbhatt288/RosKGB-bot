@@ -9,7 +9,7 @@ class errorCog(commands.Cog):
     @commands.command(aliases = ["bugcheck", "bc"])
     async def buc(self, nes, value: str = None):
         if(checkValue(value) == False):
-            await nes.send("Enter the valid error code!")
+            await nes.send("Enter a valid error code!")
             return
 
         obj = untangle.parse("error_codes/bugcheck.xml")
@@ -31,7 +31,7 @@ class errorCog(commands.Cog):
     @commands.command(aliases = ["hresult", "hr"])
     async def hre(self, nes, value: str = None):
         if(checkValue(value) == False):
-            await nes.send("Enter the valid error code!")
+            await nes.send("Enter a valid error code!")
             return
 
         obj = untangle.parse("error_codes/hresult.xml")
@@ -52,7 +52,7 @@ class errorCog(commands.Cog):
     @commands.command(aliases = ["mmresult", "mm"])
     async def mmr(self, nes, value: str = None):
         if(checkValue(value) == False):
-            await nes.send("Enter the valid error code!")
+            await nes.send("Enter a valid error code!")
             return
 
         obj = untangle.parse("error_codes/mmresult.xml")
@@ -73,7 +73,7 @@ class errorCog(commands.Cog):
     @commands.command(aliases = ["ntresult", "nt"])
     async def ntr(self, nes, value: str = None):
         if(checkValue(value) == False):
-            await nes.send("Enter the valid error code!")
+            await nes.send("Enter a valid error code!")
             return
 
         obj = untangle.parse("error_codes/ntstatus.xml")
@@ -94,7 +94,7 @@ class errorCog(commands.Cog):
     @commands.command(aliases = ["winerror", "win32"])
     async def wie(self, nes, value: str = None):
         if(checkValue(value) == False):
-            await nes.send("Enter the valid error code!")
+            await nes.send("Enter a valid error code!")
             return
 
         obj = untangle.parse("error_codes/winerror.xml")
@@ -118,7 +118,7 @@ class errorCog(commands.Cog):
     @commands.command(aliases = ["windowmessage", "wm"])
     async def wme(self, nes, value: str = None):
         if(checkValue(value) == False):
-            await nes.send("Enter the valid error code!")
+            await nes.send("Enter a valid error code!")
             return
 
         obj = untangle.parse("error_codes/wm.xml")
@@ -152,7 +152,7 @@ def adjustValue(value):
     return value
 
 def checkValue(value):
-    invalid_chars = set("!@#$%^&*()-_=+/*-[];',.\|<>?}{`~")
+    invalid_chars = set("!@#$%^&*()-_=+/*-[];',.\|<>?}{`~₹€")
     if not value:
         return False
 

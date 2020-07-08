@@ -1,4 +1,5 @@
 import discord
+import pickle
 import asyncio
 import configparser
 import datetime
@@ -21,12 +22,12 @@ handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w"
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
 
-extensions = ["server", "error_code"]
+extensions = ["server", "error_code", "fun"]
 
 
 @client.event
 async def on_ready():
-    await client.change_presence(activity=discord.Game(name="Type !help"))
+    await client.change_presence(activity=discord.Game(name = f"Type {bot_prefix}help"))
     print("Bot is online as {0.user}" .format(client))
 
 @client.event
@@ -57,18 +58,26 @@ async def on_member_join(member):
 async def shutdown(nes):
     role = discord.utils.get(nes.guild.roles, name = admin_role)
     if str(nes.message.author.id) == server_owner_id or role in nes.author.roles:
+        from server import blacklisted
+        with open("files/blacklist.dat", "wb") as blacklist:
+            pickle.dump(blacklisted, blacklist)
+
         await nes.send("Shutting down...")
         time.sleep(3)
         sys.exit(0)
 
     else:
-        await nes.send("You do not have enough permissions to shutdown the bot!")
+        await nes.send("You do not have enough permissions to shut down the bot!")
         return
 
 @client.command(pass_context = True)
 async def reboot(nes):
     role = discord.utils.get(nes.guild.roles, name = admin_role)
     if str(nes.message.author.id) == server_owner_id or role in nes.author.roles:
+        from server import blacklisted
+        with open("files/blacklist.dat", "wb") as blacklist:
+            pickle.dump(blacklisted, blacklist)
+
         await nes.send("Rebooting...")
         time.sleep(3)
         python = sys.executable
@@ -84,27 +93,38 @@ async def help(nes, value: str = None):
         colour = discord.Colour.blue()
     )
     if not value:
-        embed.set_author(name = "RosKGB V1.0 - Help")
+        embed.set_author(name = "RosKGB V1.1 - Help")
         embed.add_field(name = f"{bot_prefix}help error_code", value = "Lists commands for the error codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}help fun", value = "Lists commands for having fun.", inline = False)
         embed.add_field(name = f"{bot_prefix}help server", value = "Lists commands for the server.", inline = False)
         await nes.send(embed = embed)
 
     elif value == "error_code":
-        embed.set_author(name = "RosKGB V1.0 - Help - Error Code")
-        embed.add_field(name = f"{bot_prefix}bc OR {bot_prefix}bugcheck <VALUE>", value = "Gives meaning of bugcheck (BSoD) STOP codes.", inline = False)
-        embed.add_field(name = f"{bot_prefix}hr OR {bot_prefix}hresult <VALUE>", value = "Gives meaning of HRESULT (result of a handle) codes.", inline = False)
-        embed.add_field(name = f"{bot_prefix}mm OR {bot_prefix}multimedia <VALUE>", value = "Gives meaning of MM (Multimedia API) codes.", inline = False)
-       	embed.add_field(name = f"{bot_prefix}nt OR {bot_prefix}ntresult  <VALUE>", value = "Gives meaning of NT codes.", inline = False)
-        embed.add_field(name = f"{bot_prefix}win32 OR {bot_prefix}winerror <VALUE>", value = "Gives meaning of Win32 codes.", inline = False)
-        embed.add_field(name = f"{bot_prefix}wm OR {bot_prefix}windowmessge <VALUE>", value = "Gives meaning of WM (Window USER message) codes.", inline = False)
+        embed.set_author(name = "RosKGB V1.1 - Help - Error Code")
+        embed.add_field(name = f"{bot_prefix}bc OR {bot_prefix}bugcheck <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}hr OR {bot_prefix}hresult <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}mm OR {bot_prefix}multimedia <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+       	embed.add_field(name = f"{bot_prefix}nt OR {bot_prefix}ntresult  <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}win32 OR {bot_prefix}winerror <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}wm OR {bot_prefix}windowmessge <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
         await nes.send(embed = embed)
 
     elif value == "server":
-        embed.set_author(name = "RosKGB V1.0 - Help - Server")
+        embed.set_author(name = "RosKGB V1.1 - Help - Server")
         embed.add_field(name = f"{bot_prefix}polban <ID>", value = f"Bans the user from using {bot_prefix}pol. (FOR ADMINS AND MODERATORS ONLY).", inline = False)
         embed.add_field(name = f"{bot_prefix}listids", value = f"Lists the user ids banned for using {bot_prefix}pol. (FOR ADMINS AND MODERATORS ONLY).", inline = False)
         embed.add_field(name = f"{bot_prefix}pol", value = "Gives politics role to you.", inline = False)
         embed.add_field(name = f"{bot_prefix}polunban <ID>", value = f"Unbans the user from using {bot_prefix}pol. (FOR ADMINS AND MODERATORS ONLY).", inline = False)
+        await nes.send(embed = embed)
+
+    elif value == "fun":
+        embed.set_author(name = "RosKGB V1.1 - Help - Fun")
+        embed.add_field(name = f"{bot_prefix}boris", value = f"Gives you some random quotes of our slav superstar!", inline = False)
+        embed.add_field(name = f"{bot_prefix}dadjokes OR {bot_prefix}dj", value = f"Gives you random dad jokes!", inline = False)
+        embed.add_field(name = f"{bot_prefix}god <num>", value = f"Talk with god! (Maximum words 1-100)", inline = False)
+        embed.add_field(name = f"{bot_prefix}hi", value = f"Says hello to you!", inline = False)
+        embed.add_field(name = f"{bot_prefix}quotes", value = f"Gives you some random quotes!", inline = False)
+        embed.add_field(name = f"{bot_prefix}say \"<string>\"", value = f"Repeats every sentence you say!", inline = False)
         await nes.send(embed = embed)
 
     else:
@@ -123,11 +143,11 @@ if __name__ == "__main__":
         config.read("files/config.ini")
         token = config["CREDENTIALS"]["TOKEN"]
         server_owner_id = config["CREDENTIALS"]["SERVEROWNERID"]
-        admin_role = config["ROLE_NAMES"]["ADMINISTRATOR"]
         general_channel_id = int(config["CHANNEL_IDS"]["GENERAL"])
         rules_channel_id = int(config["CHANNEL_IDS"]["RULES"])
         readme_channel_id = int(config["CHANNEL_IDS"]["README"])
         instructional_channel_id = int(config["CHANNEL_IDS"]["INSTRUCTIONS"])
+        admin_role = config["ROLE_NAMES"]["ADMINISTRATOR"]
 
     else:
         print("config.ini either deleted or corrupted! Please check and try again.")
