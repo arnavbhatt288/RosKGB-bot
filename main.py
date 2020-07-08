@@ -101,12 +101,12 @@ async def help(nes, value: str = None):
 
     elif value == "error_code":
         embed.set_author(name = "RosKGB V1.1 - Help - Error Code")
-        embed.add_field(name = f"{bot_prefix}bc OR {bot_prefix}bugcheck <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-        embed.add_field(name = f"{bot_prefix}hr OR {bot_prefix}hresult <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-        embed.add_field(name = f"{bot_prefix}mm OR {bot_prefix}multimedia <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-       	embed.add_field(name = f"{bot_prefix}nt OR {bot_prefix}ntresult  <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-        embed.add_field(name = f"{bot_prefix}win32 OR {bot_prefix}winerror <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
-        embed.add_field(name = f"{bot_prefix}wm OR {bot_prefix}windowmessge <VALUE>", value = "Gives meaning of bugcheck codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}bc OR {bot_prefix}bugcheck <VALUE>", value = "Gives meaning of bugcheck (BSoD) STOP codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}hr OR {bot_prefix}hresult <VALUE>", value = "Gives meaning of HRESULT (result of a handle) codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}mm OR {bot_prefix}multimedia <VALUE>", value = "Gives meaning of MM (Multimedia API) codes.", inline = False)
+       	embed.add_field(name = f"{bot_prefix}nt OR {bot_prefix}ntresult  <VALUE>", value = "Gives meaning of NT codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}win32 OR {bot_prefix}winerror <VALUE>", value = "Gives meaning of Win32 codes.", inline = False)
+        embed.add_field(name = f"{bot_prefix}wm OR {bot_prefix}windowmessge <VALUE>", value = "Gives meaning of WM (Window USER message) codes.", inline = False)
         await nes.send(embed = embed)
 
     elif value == "server":
