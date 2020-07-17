@@ -21,6 +21,7 @@ class errorCog(commands.Cog):
             
         
         value = adjustValue(value)
+        value = value.upper()
 
         if value in bugdict:
             await nes.send("The meaning of this error code is - `{}`" .format(bugdict[value]))
@@ -42,6 +43,7 @@ class errorCog(commands.Cog):
             hrdict[Hresult['value']] = Hresult['text']
 
         value = adjustValue(value)
+        value = value.upper()
 
         if value in hrdict:
             await nes.send("The meaning of this error code is - `{}`" .format(hrdict[value]))
@@ -63,6 +65,7 @@ class errorCog(commands.Cog):
             mmdict[Mmresult['value']] = Mmresult['text']
 
         value = adjustValue(value)
+        value = value.upper()
 
         if value in mmdict:
             await nes.send("The meaning of this error code is - `{}`" .format(mmdict[value]))
@@ -84,6 +87,7 @@ class errorCog(commands.Cog):
             ntdict[Ntstatus['value']] = Ntstatus['text']
 
         value = adjustValue(value)
+        value = value.upper()
 
         if value in ntdict:
             await nes.send("The meaning of this error code is - `{}`" .format(ntdict[value]))
@@ -108,6 +112,7 @@ class errorCog(commands.Cog):
             windict[errorCode] = Winerror['text']
 
         value = adjustValue(value)
+        value = value.upper()
 
         if value in windict:
             await nes.send("The meaning of this error code is - `{}`" .format(windict[value]))
@@ -132,6 +137,7 @@ class errorCog(commands.Cog):
             wmdict[errorCode] = Wm['text']
 
         value = adjustValue(value)
+        value = value.upper()
 
         if value in wmdict:
             await nes.send("The meaning of this error code is - `{}`" .format(wmdict[value]))
