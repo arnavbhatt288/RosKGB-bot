@@ -1,3 +1,4 @@
+ 
 import configparser
 import discord
 import os
@@ -6,9 +7,16 @@ import math
 from discord.ext import commands
 from corpus import corpus
 
+# Had to do this because ToS of Discord.
+blacklisted_words = ["nigger", "nigga"]
+
+funni_words = ["gay", "weeb", "weeabo", "stupid", "idiot", "moron", "nullptr"]
+
 if os.path.isfile("files/config.ini"):
     config = configparser.ConfigParser()
     config.read("files/config.ini")
+    shitpost_channel_id = int(config["CHANNEL_IDS"]["SHITPOST"])
+    commands_channel_id = int(config["CHANNEL_IDS"]["COMMANDS"])
     troll_emote = config["EMOTE_ID"]["TROLL"]
 
 else:
@@ -94,11 +102,19 @@ class funCog(commands.Cog):
         await nes.send(f"{godsong}")
 
     @commands.command()
-    async def say(self, nes, string: str = None):
+    async def say(self, nes, *, string: str = None):
         rand_num = 1
-        res = string.split() 
-        if "am" in res and "stupid" in res or "nullptr" in res:
-            rand_num = random.randint(0,3)
+        string = string.replace("@", "@\u200B")
+        res = string.split()
+        
+        for words in res:
+            if words in blacklisted_words:
+                await nes.message.delete()
+                message = await nes.send(f"No, don't.", delete_after = 3)
+                return
+        
+            elif "am" in res and words in funni_words:
+                rand_num = random.randint(0,3)
 
         if(rand_num == 1):
             await nes.send(f"{string}")
