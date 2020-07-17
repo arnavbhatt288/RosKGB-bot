@@ -15,8 +15,8 @@ funni_words = ["gay", "weeb", "weeabo", "stupid", "idiot", "moron", "nullptr"]
 if os.path.isfile("files/config.ini"):
     config = configparser.ConfigParser()
     config.read("files/config.ini")
-    shitpost_channel_id = int(config["CHANNEL_IDS"]["SHITPOST"])
-    commands_channel_id = int(config["CHANNEL_IDS"]["COMMANDS"])
+    shitpost_channel_id = config["CHANNEL_IDS"]["SHITPOST"]
+    commands_channel_id = config["CHANNEL_IDS"]["COMMANDS"]
     troll_emote = config["EMOTE_ID"]["TROLL"]
 
 else:
@@ -53,11 +53,17 @@ class funCog(commands.Cog):
 	
     @commands.command()
     async def hi(self, nes):
+        if(channel_check(nes) == False):
+            return
+
         author = nes.message.author
         await nes.send(f"{author.mention} Hello World!")
 
     @commands.command()
     async def quote(self, nes):
+        if(channel_check(nes) == False):
+            return
+
         global quoteData
         if(len(quoteData) == 0):
             with open("files/quotes.txt") as quotes:
@@ -69,6 +75,9 @@ class funCog(commands.Cog):
 
     @commands.command()
     async def boris(self, nes):
+        if(channel_check(nes) == False):
+            return
+
         global b_quoteData
         if(len(b_quoteData) == 0):
             with open("files/boris_quotes.txt") as quotes:
@@ -80,6 +89,9 @@ class funCog(commands.Cog):
 
     @commands.command(aliases = ["dadjokes", "dj"])
     async def dad_jokes(self, nes):
+        if(channel_check(nes) == False):
+            return
+
         global jokeData
         if(len(jokeData) == 0):
             with open("files/daad_jokes.txt") as quotes:
@@ -91,8 +103,12 @@ class funCog(commands.Cog):
 
     @commands.command()
     async def god(self, nes, num: int):
+        if(channel_check(nes) == False):
+            return
+
         if(num < 1 or num > 100):
             await nes.send("The limit is 1 to 100 chars!")
+            return
         
         godsong = ""
         for i in range(0, num):
@@ -103,6 +119,9 @@ class funCog(commands.Cog):
 
     @commands.command()
     async def say(self, nes, *, string: str = None):
+        if(channel_check(nes) == False):
+            return
+
         rand_num = 1
         string = string.replace("@", "@\u200B")
         res = string.split()
@@ -122,6 +141,19 @@ class funCog(commands.Cog):
         else:
             await nes.send(f"We know.")
 
+    @god.error
+    async def polunban_error(self, nes, error):
+        error = getattr(error, "original", error)
+        if isinstance(error, commands.BadArgument):
+            await nes.send("Enter the argument as integer!")
+
+def channel_check(nes):
+    channel_id = str(nes.message.channel.id)
+    if(channel_id == shitpost_channel_id or channel_id == commands_channel_id):
+        return True
+
+    else:
+        return False
 
 def contains_word(s, w):
     return (' ' + w + ' ') in (' ' + s + ' ')
