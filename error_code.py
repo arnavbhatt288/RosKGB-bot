@@ -1,3 +1,4 @@
+
 import discord
 import untangle
 from discord.ext import commands
@@ -5,7 +6,7 @@ from discord.ext import commands
 class errorCog(commands.Cog):
     def __init__(self, client):
         self.client = client
-    
+
     @commands.command(aliases = ["bugcheck", "bc"])
     async def buc(self, nes, value: str = None):
         if(checkValue(value) == False):
@@ -18,8 +19,8 @@ class errorCog(commands.Cog):
 
         for BugCheck in obj.BugCheckList.BugCheck:
             bugdict[BugCheck['value']] = BugCheck['text']
-            
-        
+
+
         value = adjustValue(value)
         value = value.upper()
 
@@ -152,8 +153,6 @@ def adjustValue(value):
     if len(value) < 8:
         strValue = 8 - len(value)
         value = "0" * strValue + value
-        
-    print(value)
 
     return value
 

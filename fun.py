@@ -1,34 +1,27 @@
- 
+
 import configparser
 import discord
 import os
 import random
 import math
 from discord.ext import commands
+from discord.utils import get
 from corpus import corpus
 
 # Had to do this because ToS of Discord.
 blacklisted_words = ["nigger", "nigga"]
 
-funni_words = ["gay", "weeb", "weeabo", "stupid", "idiot", "moron", "nullptr"]
-
 if os.path.isfile("files/config.ini"):
     config = configparser.ConfigParser()
     config.read("files/config.ini")
+    admin_role = config["ROLE_NAMES"]["ADMINISTRATOR"]
+    mod_role = config["ROLE_NAMES"]["MODERATOR"]
     shitpost_channel_id = config["CHANNEL_IDS"]["SHITPOST"]
     commands_channel_id = config["CHANNEL_IDS"]["COMMANDS"]
     troll_emote = config["EMOTE_ID"]["TROLL"]
 
 else:
     print("config.ini either deleted or corrupted! Please check and try again.")
-    sys.exit(0)
-
-if os.path.isfile("files/boris_quotes.txt"):
-    with open("files/boris_quotes.txt") as b_quotes:
-        b_quoteData = b_quotes.readlines()
-
-else:
-    print("boris_quotes.txt either deleted or corrupted! Please check and try again.")
     sys.exit(0)
 
 if os.path.isfile("files/quotes.txt"):
@@ -50,7 +43,7 @@ else:
 class funCog(commands.Cog):
     def __init__(self, client):
         self.client = client
-	
+
     @commands.command()
     async def hi(self, nes):
         if(channel_check(nes) == False):
@@ -70,22 +63,8 @@ class funCog(commands.Cog):
                 quoteData = quotes.readlines()
 
         quotes = random.choice(quoteData)
-        await nes.send(f"{quotes}")
+        await nes.send(quotes)
         quoteData.remove(quotes)
-
-    @commands.command()
-    async def boris(self, nes):
-        if(channel_check(nes) == False):
-            return
-
-        global b_quoteData
-        if(len(b_quoteData) == 0):
-            with open("files/boris_quotes.txt") as quotes:
-                b_quoteData = quotes.readlines()
-    
-        boris = random.choice(b_quoteData)
-        await nes.send(f"{boris}")
-        b_quoteData.remove(boris)
 
     @commands.command(aliases = ["dadjokes", "dj"])
     async def dad_jokes(self, nes):
@@ -94,7 +73,7 @@ class funCog(commands.Cog):
 
         global jokeData
         if(len(jokeData) == 0):
-            with open("files/daad_jokes.txt") as quotes:
+            with open("files/dad_jokes.txt") as quotes:
                 jokeData = quotes.readlines()
 
         jokes = random.choice(jokeData)
@@ -102,61 +81,60 @@ class funCog(commands.Cog):
         jokeData.remove(jokes)
 
     @commands.command()
-    async def god(self, nes, num: int):
+    async def god(self, nes, *, string: str = None):
         if(channel_check(nes) == False):
             return
 
+        num = len(string.split())
         if(num < 1 or num > 100):
             await nes.send("The limit is 1 to 100 chars!")
             return
-        
+
         godsong = ""
         for i in range(0, num):
             index = math.floor(random.uniform(0, 1) * len(corpus))
             godsong = godsong + " " + corpus[index]
 
-        await nes.send(f"{godsong}")
+        await nes.send(godsong)
 
     @commands.command()
     async def say(self, nes, *, string: str = None):
         if(channel_check(nes) == False):
             return
 
-        rand_num = 1
         string = string.replace("@", "@\u200B")
+
         res = string.split()
-        
         for words in res:
             if words in blacklisted_words:
                 await nes.message.delete()
                 message = await nes.send(f"No, don't.", delete_after = 3)
                 return
-        
-            elif "am" in res and words in funni_words:
-                rand_num = random.randint(0,3)
 
-        if(rand_num == 1):
-            await nes.send(f"{string}")
-
-        else:
-            await nes.send(f"We know.")
+        await nes.send(string)
 
     @god.error
-    async def polunban_error(self, nes, error):
+    async def god_error(self, nes, error):
         error = getattr(error, "original", error)
         if isinstance(error, commands.BadArgument):
-            await nes.send("Enter the argument as integer!")
+            await nes.send("Enter the argument as string!")
 
 def channel_check(nes):
     channel_id = str(nes.message.channel.id)
+
     if(channel_id == shitpost_channel_id or channel_id == commands_channel_id):
         return True
 
     else:
-        return False
+        role = get(nes.guild.roles, name = admin_role)
+        if role in nes.author.roles:
+            return True
 
-def contains_word(s, w):
-    return (' ' + w + ' ') in (' ' + s + ' ')
+        role = get(nes.guild.roles, name = mod_role)
+        if role in nes.author.roles:
+            return True
+
+        return False
 
 def setup(client):
     client.add_cog(funCog(client))
