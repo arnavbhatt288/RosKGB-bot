@@ -4,7 +4,7 @@ import pickle
 import asyncio
 import configparser
 import datetime
-import logging
+#import logging
 import signal
 import sys
 import time
@@ -12,15 +12,15 @@ import traceback
 import os
 from discord.ext import commands
 
-logger = logging.getLogger("discord")
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
-handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-logger.addHandler(handler)
+#logger = logging.getLogger("discord")
+#logger.setLevel(logging.DEBUG)
+#handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
+#handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+#logger.addHandler(handler)
 
 extensions = ["error_code", "fun"]
 
-bot_prefix = "--"
+bot_prefix = "!"
 
 intents = discord.Intents.default()
 intents.members = True
@@ -30,17 +30,16 @@ client.remove_command("help")
 
 @client.event
 async def on_ready():
-    await client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = f"for {bot_prefix}help"))
+    await client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = f"Discord getting uglier. {bot_prefix}help"))
     print("Bot is online as {0.user}" .format(client))
 
 @client.event
 async def on_message(message):
     now = datetime.datetime.now()
     today = now.strftime("%Y-%m-%d %H:%M")
-    file = open("chat.txt", "a")
 
-    file.write(str(today) + f" {message.channel}: {message.author}: {message.content}\n")
-    file.close()
+    if len(message.content) > 2000 or len(message.stickers) > 0:
+        await message.delete()
 
     await client.process_commands(message)
 
@@ -99,6 +98,7 @@ async def help(nes, value: str = None):
     elif value == "error_code":
         embed.set_author(name = "RosKGB V1.2 - Help - Error Code")
         embed.set_thumbnail(url = avatar)
+        embed.add_field(name = f"{bot_prefix}error OR {bot_prefix}code <VALUE>", value = "Tries to fetch a code from any of the below in one single command.", inline = False)
         embed.add_field(name = f"{bot_prefix}bc OR {bot_prefix}bugcheck <VALUE>", value = "Gives meaning of bugcheck (BSoD) STOP codes.", inline = False)
         embed.add_field(name = f"{bot_prefix}hr OR {bot_prefix}hresult <VALUE>", value = "Gives meaning of HRESULT (result of a handle) codes.", inline = False)
         embed.add_field(name = f"{bot_prefix}mm OR {bot_prefix}multimedia <VALUE>", value = "Gives meaning of MM (Multimedia API) codes.", inline = False)
